@@ -34,6 +34,18 @@
   <div class="w-full max-w-4xl bg-white rounded-3xl shadow-xl p-6 md:p-8">
     <h1 class="text-3xl md:text-4xl font-bold mb-6 text-center bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent">Complete the Word — Multiplayer</h1>
 
+    <!-- Game Rules Section -->
+    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 rounded-lg">
+      <h2 class="text-xl font-bold text-yellow-700 mb-2">Game Rules</h2>
+      <ul class="list-disc pl-5 space-y-1 text-yellow-700">
+        <li>Players take turns adding one letter to form a valid English word</li>
+        <li>You can continue adding letters even after completing a valid word</li>
+        <li>Elimination occurs only when a letter makes it impossible to form any valid word</li>
+        <li>Starting letters are not restricted for future rounds</li>
+        <li>The last player remaining wins the game</li>
+      </ul>
+    </div>
+
     <div id="setup" class="space-y-6">
       <div class="flex flex-col sm:flex-row gap-4 items-center justify-center">
         <label class="text-lg font-medium text-gray-700">Number of players:</label>
@@ -102,6 +114,7 @@ let currentWord = '';
 let usedWords = new Set();
 let timerInterval = null;
 let timeLeft = 10;
+let roundNumber = 1;
 
 const numPlayersInput = document.getElementById('numPlayers');
 const setPlayersBtn = document.getElementById('setPlayers');
@@ -137,6 +150,7 @@ startBtn.addEventListener('click', () => {
   currentIndex = 0;
   currentWord = '';
   usedWords = new Set();
+  roundNumber = 1;
   updateUI();
   startTurn();
 });
@@ -163,6 +177,7 @@ function renderPlayers() {
 function updateUI() {
   document.getElementById('currentWord').textContent = currentWord || '—';
   document.getElementById('statusText').textContent = '—';
+  document.getElementById('statusText').className = 'text-lg font-medium';
   document.getElementById('elimList').innerHTML = active.filter(p=>p.eliminated).map(p=>`<li>${p.name}</li>`).join('') || '<li class="text-gray-500">None yet</li>';
   document.getElementById('usedList').innerHTML = Array.from(usedWords).map(w=>`<li>${w}</li>`).join('') || '<li class="text-gray-500">None yet</li>';
   
@@ -213,51 +228,51 @@ async function submitLetter() {
   const v = (input.value || '').trim().toLowerCase();
   if (!v.match(/^[a-z]$/)) { 
     document.getElementById('statusText').textContent = '⚠️ Enter a single letter';
+    document.getElementById('statusText').className = 'text-red-500 font-bold text-lg';
     setTimeout(() => {
       document.getElementById('statusText').textContent = '—';
+      document.getElementById('statusText').className = 'text-lg font-medium';
     }, 2000);
     return; 
   }
   input.value = '';
+  
   // append and check
+  const previousWord = currentWord;
   currentWord += v;
   const resp = await apiCheck(currentWord);
   const statusText = document.getElementById('statusText');
+  
   if (!resp.canContinue) {
-    statusText.textContent = '❌ INVALID — eliminated';
+    // Letter makes it impossible to form any valid word - eliminate player
+    statusText.textContent = `❌ "${currentWord}" cannot form any valid word - ${active[currentIndex].name} is eliminated!`;
     statusText.className = 'text-red-500 font-bold text-lg';
     eliminateCurrent();
     return;
   } else {
-    statusText.textContent = '✅ VALID';
+    statusText.textContent = `✅ "${currentWord}" is valid`;
     statusText.className = 'text-green-500 font-bold text-lg';
   }
-  // Check if it's a full word but don't end the game
+  
+  // Check if it's a full word
   if (resp.isWord) {
-    // completed a full word
-    // Only eliminate if the word has already been used AND it's longer than 1 character
-    // or if it's a single character that has been used in a longer word context
-    if (usedWords.has(currentWord) && currentWord.length > 1) {
-      statusText.textContent = '❌ Word already used — eliminated';
-      statusText.className = 'text-red-500 font-bold text-lg';
-      eliminateCurrent();
-      return;
+    // Completed a full word - add to used words but continue game
+    if (!usedWords.has(currentWord)) {
+      usedWords.add(currentWord);
+      statusText.textContent = `✅ Completed word: ${currentWord.toUpperCase()}`;
+      statusText.className = 'text-green-500 font-bold text-lg';
     }
-    usedWords.add(currentWord);
-    statusText.textContent = `✅ VALID WORD: ${currentWord.toUpperCase()}`;
-    statusText.className = 'text-green-500 font-bold text-lg';
-    // Continue the game - don't reset or change turns
-    // But if it's a single letter, move to next player to avoid getting stuck
-    if (currentWord.length === 1) {
-      setTimeout(() => {
-        nextTurn();
-      }, 1500);
-    }
+    // Continue the game - don't eliminate, just move to next player
+    setTimeout(() => {
+      nextTurn();
+    }, 1500);
+    return;
   }
-  // Continue to next player only if it's not a full word
-  if (!resp.isWord) {
+  
+  // Valid letter that continues the word - move to next player
+  setTimeout(() => {
     nextTurn();
-  }
+  }, 1000);
 }
 
 function eliminateCurrent() {
@@ -265,42 +280,63 @@ function eliminateCurrent() {
   active[currentIndex].eliminated = true;
   updateUI();
   const remaining = active.filter(p=>!p.eliminated);
+  
   if (remaining.length === 1) {
-    document.getElementById('statusText').textContent = `🏆 ${remaining[0].name} wins!`;
+    document.getElementById('statusText').textContent = `🏆 ${remaining[0].name} wins the game!`;
     document.getElementById('statusText').className = 'text-2xl font-bold text-yellow-400';
     // Disable further input
     document.getElementById('letterInput').disabled = true;
     document.getElementById('submitLetter').disabled = true;
     return;
   }
-  // find next
-  let found = false;
-  for (let i=1;i<=active.length;i++) {
+  
+  // Find next active player
+  let nextIndex = -1;
+  for (let i=1; i<=active.length; i++) {
     const idx = (currentIndex + i) % active.length;
-    if (!active[idx].eliminated) { currentIndex = idx; found = true; break; }
+    if (!active[idx].eliminated) {
+      nextIndex = idx;
+      break;
+    }
   }
-  timeLeft = 10;
-  updateUI();
-  startTurn();
+  
+  if (nextIndex !== -1) {
+    currentIndex = nextIndex;
+    timeLeft = 10;
+    updateUI();
+    setTimeout(() => {
+      startTurn();
+    }, 2000);
+  }
 }
 
 function nextTurn() {
   clearInterval(timerInterval);
-  // move to next active player
-  for (let i=1;i<=active.length;i++) {
+  
+  // Move to next active player
+  let nextIndex = -1;
+  for (let i=1; i<=active.length; i++) {
     const idx = (currentIndex + i) % active.length;
-    if (!active[idx].eliminated) { currentIndex = idx; break; }
+    if (!active[idx].eliminated) {
+      nextIndex = idx;
+      break;
+    }
   }
-  timeLeft = 10;
-  updateUI();
-  startTurn();
+  
+  if (nextIndex !== -1) {
+    currentIndex = nextIndex;
+    timeLeft = 10;
+    updateUI();
+    startTurn();
+  }
 }
 
 function startTurn() {
   updateUI();
   const input = document.getElementById('letterInput');
   input.focus();
-  // start timer
+  
+  // Start timer
   clearInterval(timerInterval);
   timerInterval = setInterval(() => {
     timeLeft--;
@@ -322,7 +358,7 @@ document.getElementById('letterInput').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') submitLetter();
 });
 
-// initialize sample setup
+// Initialize sample setup
 setPlayersBtn.click();
 </script>
 </body>
