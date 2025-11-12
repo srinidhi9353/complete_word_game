@@ -235,7 +235,9 @@ async function submitLetter() {
   // Check if it's a full word but don't end the game
   if (resp.isWord) {
     // completed a full word
-    if (usedWords.has(currentWord)) {
+    // Only eliminate if the word has already been used AND it's longer than 1 character
+    // or if it's a single character that has been used in a longer word context
+    if (usedWords.has(currentWord) && currentWord.length > 1) {
       statusText.textContent = '❌ Word already used — eliminated';
       statusText.className = 'text-red-500 font-bold text-lg';
       eliminateCurrent();
@@ -245,6 +247,12 @@ async function submitLetter() {
     statusText.textContent = `✅ VALID WORD: ${currentWord.toUpperCase()}`;
     statusText.className = 'text-green-500 font-bold text-lg';
     // Continue the game - don't reset or change turns
+    // But if it's a single letter, move to next player to avoid getting stuck
+    if (currentWord.length === 1) {
+      setTimeout(() => {
+        nextTurn();
+      }, 1500);
+    }
   }
   // Continue to next player only if it's not a full word
   if (!resp.isWord) {
