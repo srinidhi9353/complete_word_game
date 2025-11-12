@@ -235,16 +235,39 @@ async function submitLetter() {
     }, 2000);
     return; 
   }
+  
+  // Check if adding this letter would make the word invalid BEFORE adding it
+  const testWord = currentWord + v;
+  console.log('Testing word before adding:', testWord);
+  
+  // Test the word first
+  const testResp = await apiCheck(testWord);
+  console.log('Test response:', testResp);
+  
+  if (!testResp.canContinue) {
+    // Don't allow this letter to be added
+    document.getElementById('statusText').textContent = `⚠️ "${testWord}" cannot form any valid word - try a different letter`;
+    document.getElementById('statusText').className = 'text-orange-500 font-bold text-lg';
+    setTimeout(() => {
+      document.getElementById('statusText').textContent = '—';
+      document.getElementById('statusText').className = 'text-lg font-medium';
+    }, 2000);
+    return;
+  }
+  
   input.value = '';
   
   // append and check
-  currentWord += v;
-  const resp = await apiCheck(currentWord);
+  currentWord = testWord;
+  const resp = testResp; // We already have the response
   const statusText = document.getElementById('statusText');
   
   // Debug logging
+  console.log('Player entered:', v);
   console.log('Current word:', currentWord);
   console.log('API Response:', resp);
+  console.log('isWord:', resp.isWord);
+  console.log('canContinue:', resp.canContinue);
   
   // Always allow valid letters to continue
   if (resp.canContinue) {
@@ -256,17 +279,26 @@ async function submitLetter() {
       if (!usedWords.has(currentWord)) {
         usedWords.add(currentWord);
         statusText.textContent = `✅ Completed word: ${currentWord.toUpperCase()}`;
+        console.log('Added to used words:', currentWord);
+      } else {
+        statusText.textContent = `✅ Completed word (already used): ${currentWord.toUpperCase()}`;
+        console.log('Word already used:', currentWord);
       }
     }
     
+    console.log('Moving to next player');
     // Move to next player after a delay
     setTimeout(() => {
       nextTurn();
     }, 1500);
   } else {
-    // Letter makes it impossible to form any valid word - eliminate player
+    // This shouldn't happen now since we pre-checked, but just in case
     statusText.textContent = `❌ "${currentWord}" cannot form any valid word - ${active[currentIndex].name} is eliminated!`;
     statusText.className = 'text-red-500 font-bold text-lg';
+    console.log('Eliminating player due to invalid letter');
+    // Reset the word since this was an invalid move
+    currentWord = currentWord.slice(0, -1);
+    updateUI();
     setTimeout(() => {
       eliminateCurrent();
     }, 2000);
