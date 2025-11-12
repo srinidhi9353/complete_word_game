@@ -99,12 +99,21 @@
 
 <script>
 const apiCheck = async (current) => {
-  const res = await fetch('/api/check', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ current })
-  });
-  return res.json();
+  try {
+    const res = await fetch('/api/check', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ current })
+    });
+    if (!res.ok) {
+      console.error('API request failed with status:', res.status);
+      return { isWord: false, canContinue: false };
+    }
+    return res.json();
+  } catch (error) {
+    console.error('API request failed with error:', error);
+    return { isWord: false, canContinue: false };
+  }
 }
 
 let players = [];
@@ -175,6 +184,7 @@ function renderPlayers() {
 }
 
 function updateUI() {
+  console.log('Updating UI, currentWord:', currentWord);
   document.getElementById('currentWord').textContent = currentWord || '—';
   document.getElementById('statusText').textContent = '—';
   document.getElementById('statusText').className = 'text-lg font-medium';
@@ -226,7 +236,10 @@ function updateUI() {
 async function submitLetter() {
   const input = document.getElementById('letterInput');
   const v = (input.value || '').trim().toLowerCase();
+  console.log('Player entered letter:', v);
+  
   if (!v.match(/^[a-z]$/)) { 
+    console.log('Invalid input - not a single letter');
     document.getElementById('statusText').textContent = '⚠️ Enter a single letter';
     document.getElementById('statusText').className = 'text-red-500 font-bold text-lg';
     setTimeout(() => {
@@ -253,6 +266,7 @@ async function submitLetter() {
     currentWord = newWord;
     statusText.textContent = `✅ "${currentWord}" is a valid prefix`;
     statusText.className = 'text-green-500 font-bold text-lg';
+    console.log('Accepted letter, new word:', currentWord);
     
     // Move to next player after a delay
     setTimeout(() => {
@@ -260,6 +274,7 @@ async function submitLetter() {
     }, 1500);
   } else {
     // Not a valid prefix - reject the letter
+    console.log('Rejected letter:', v, 'for word:', newWord);
     statusText.textContent = `❌ "${newWord}" is not a valid prefix - try a different letter`;
     statusText.className = 'text-red-500 font-bold text-lg';
     setTimeout(() => {
