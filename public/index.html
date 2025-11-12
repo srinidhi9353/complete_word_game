@@ -238,41 +238,39 @@ async function submitLetter() {
   input.value = '';
   
   // append and check
-  const previousWord = currentWord;
   currentWord += v;
   const resp = await apiCheck(currentWord);
   const statusText = document.getElementById('statusText');
   
-  if (!resp.canContinue) {
-    // Letter makes it impossible to form any valid word - eliminate player
-    statusText.textContent = `❌ "${currentWord}" cannot form any valid word - ${active[currentIndex].name} is eliminated!`;
-    statusText.className = 'text-red-500 font-bold text-lg';
-    eliminateCurrent();
-    return;
-  } else {
+  // Debug logging
+  console.log('Current word:', currentWord);
+  console.log('API Response:', resp);
+  
+  // Always allow valid letters to continue
+  if (resp.canContinue) {
     statusText.textContent = `✅ "${currentWord}" is valid`;
     statusText.className = 'text-green-500 font-bold text-lg';
-  }
-  
-  // Check if it's a full word
-  if (resp.isWord) {
-    // Completed a full word - add to used words but continue game
-    if (!usedWords.has(currentWord)) {
-      usedWords.add(currentWord);
-      statusText.textContent = `✅ Completed word: ${currentWord.toUpperCase()}`;
-      statusText.className = 'text-green-500 font-bold text-lg';
+    
+    // If it's a complete word, add it to used words
+    if (resp.isWord) {
+      if (!usedWords.has(currentWord)) {
+        usedWords.add(currentWord);
+        statusText.textContent = `✅ Completed word: ${currentWord.toUpperCase()}`;
+      }
     }
-    // Continue the game - don't eliminate, just move to next player
+    
+    // Move to next player after a delay
     setTimeout(() => {
       nextTurn();
     }, 1500);
-    return;
+  } else {
+    // Letter makes it impossible to form any valid word - eliminate player
+    statusText.textContent = `❌ "${currentWord}" cannot form any valid word - ${active[currentIndex].name} is eliminated!`;
+    statusText.className = 'text-red-500 font-bold text-lg';
+    setTimeout(() => {
+      eliminateCurrent();
+    }, 2000);
   }
-  
-  // Valid letter that continues the word - move to next player
-  setTimeout(() => {
-    nextTurn();
-  }, 1000);
 }
 
 function eliminateCurrent() {
