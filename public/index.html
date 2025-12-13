@@ -249,6 +249,9 @@ async function submitLetter() {
     return; 
   }
   
+  // Clear the input field immediately
+  input.value = '';
+  
   // Add the letter to the current word
   const newWord = currentWord + v;
   console.log('New word:', newWord);
@@ -295,6 +298,8 @@ function eliminateCurrent() {
     // Disable further input
     document.getElementById('letterInput').disabled = true;
     document.getElementById('submitLetter').disabled = true;
+    // Clear input field
+    document.getElementById('letterInput').value = '';
     return;
   }
   
@@ -342,6 +347,8 @@ function nextTurn() {
 function startTurn() {
   updateUI();
   const input = document.getElementById('letterInput');
+  // Clear the input field and focus it for the next player
+  input.value = '';
   input.focus();
   
   // Start timer
