@@ -42,8 +42,11 @@
       box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
       border: 2px solid gold;
     }
+    .ocean-bg {
+      background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
+    }
     .word-container {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
       color: white;
       border-radius: 16px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.3);
@@ -64,7 +67,7 @@
     }
     .letter-input:focus {
       transform: scale(1.05);
-      box-shadow: 0 0 15px rgba(102, 126, 234, 0.6);
+      box-shadow: 0 0 15px rgba(26, 41, 128, 0.6);
     }
     .timer-circle {
       width: 60px;
@@ -80,11 +83,15 @@
     .win-animation {
       animation: bounce 0.5s ease infinite alternate;
     }
+    .mic-active {
+      background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+      box-shadow: 0 0 15px rgba(255, 65, 108, 0.5);
+    }
   </style>
 </head>
-<body class="bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800 min-h-screen flex items-center justify-center p-2">
+<body class="ocean-bg min-h-screen flex items-center justify-center p-2">
   <div class="w-full max-w-4xl bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl p-4 md:p-6 border border-white/20">
-    <h1 class="text-2xl md:text-3xl font-bold mb-4 text-center bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-500 bg-clip-text text-transparent animate__animated animate__fadeInDown">
+    <h1 class="text-2xl md:text-3xl font-bold mb-4 text-center text-white animate__animated animate__fadeInDown">
       🎯 Complete the Word
     </h1>
 
@@ -95,7 +102,7 @@
           <h2 class="text-lg font-bold text-white mb-3 flex items-center">
             <span class="mr-1">👥</span> Players
           </h2>
-          <div id="playersContainer" class="space-y-3 max-h-64 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-purple-500 scrollbar-track-purple-900/50 rounded-lg">
+          <div id="playersContainer" class="space-y-3 max-h-64 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-blue-500 scrollbar-track-blue-900/50 rounded-lg">
             <!-- Player cards will be dynamically inserted here -->
           </div>
           
@@ -131,7 +138,7 @@
           <!-- Timer and Controls -->
           <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-5">
             <div class="flex items-center">
-              <div class="timer-circle bg-gradient-to-r from-green-500 to-emerald-500 text-white">
+              <div class="timer-circle bg-gradient-to-r from-green-500 to-teal-500 text-white">
                 <span id="timerDisplay">10</span>s
               </div>
               <div class="ml-3">
@@ -141,6 +148,9 @@
             </div>
             
             <div class="flex gap-2">
+              <button id="micToggleBtn" class="px-3 py-2 bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-lg hover:from-purple-700 hover:to-indigo-800 transition-all transform hover:scale-105 shadow-lg text-sm font-bold flex items-center">
+                <span class="mr-1">🎤</span> Mic
+              </button>
               <button id="restartBtn" class="px-3 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition-all transform hover:scale-105 shadow-lg text-sm font-bold flex items-center">
                 <span class="mr-1">🔄</span> Restart
               </button>
@@ -151,13 +161,21 @@
           <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 mb-4">
             <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
               <div class="text-white font-bold text-base">Enter a letter:</div>
-              <input id="letterInput" maxlength="1" class="letter-input border-2 border-purple-400 rounded-xl px-5 py-4 text-center w-20 bg-white/90 focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-lg" placeholder="A" />
-              <button id="submitLetter" class="px-5 py-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl text-base font-bold hover:from-green-600 hover:to-emerald-600 transition-all transform hover:scale-105 shadow-lg flex items-center">
+              <input id="letterInput" maxlength="1" class="letter-input border-2 border-blue-400 rounded-xl px-5 py-4 text-center w-20 bg-white/90 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-lg" placeholder="A" />
+              <button id="submitLetter" class="px-5 py-4 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-xl text-base font-bold hover:from-green-600 hover:to-teal-600 transition-all transform hover:scale-105 shadow-lg flex items-center">
                 <span class="mr-1">✅</span> Submit
               </button>
             </div>
             <div class="text-center mt-2 text-gray-300 text-sm">
               Press Enter to submit your letter
+            </div>
+          </div>
+
+          <!-- Microphone Status -->
+          <div id="micStatus" class="bg-yellow-500/20 border-l-4 border-yellow-400 p-3 rounded-lg mb-4 hidden">
+            <div class="flex items-center">
+              <span class="mr-2">🎤</span>
+              <span id="micStatusText" class="text-yellow-100">Microphone is ready. Say a letter...</span>
             </div>
           </div>
 
@@ -205,6 +223,9 @@ let currentWord = '';
 let completedWords = [];
 let timerInterval = null;
 let timeLeft = 10;
+let inputMethod = 'keyboard'; // 'keyboard' or 'microphone'
+let recognition = null;
+let isListening = false;
 
 // DOM Elements
 const currentPlayerName = document.getElementById('currentPlayerName');
@@ -212,11 +233,15 @@ const timerDisplay = document.getElementById('timerDisplay');
 const noEliminated = document.getElementById('noEliminated');
 const noCompletedWords = document.getElementById('noCompletedWords');
 const completedWordsList = document.getElementById('completedWordsList');
+const micToggleBtn = document.getElementById('micToggleBtn');
+const micStatus = document.getElementById('micStatus');
+const micStatusText = document.getElementById('micStatusText');
 
 // Get URL parameters to initialize game
 function initGameFromUrl() {
   const urlParams = new URLSearchParams(window.location.search);
   const playerNames = urlParams.get('players');
+  inputMethod = urlParams.get('input') || 'keyboard';
   
   if (playerNames) {
     const names = playerNames.split(',');
@@ -233,12 +258,98 @@ function initGameFromUrl() {
     completedWords = [];
     timeLeft = 10;
     updateUI();
+    
+    // Initialize speech recognition if needed
+    if (inputMethod === 'microphone') {
+      initSpeechRecognition();
+      micStatus.classList.remove('hidden');
+      micToggleBtn.classList.add('mic-active');
+    }
+    
     startTurn();
   } else {
-    // Redirect to main page if no players
-    window.location.href = '/';
+    // Redirect to start page if no players
+    window.location.href = '/start.html';
   }
 }
+
+// Initialize speech recognition
+function initSpeechRecognition() {
+  if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+    
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript.trim().toLowerCase();
+      console.log('Speech recognized:', transcript);
+      
+      // Extract first letter
+      const letter = transcript.charAt(0);
+      if (letter.match(/^[a-z]$/)) {
+        document.getElementById('letterInput').value = letter;
+        micStatusText.textContent = `Recognized: "${letter.toUpperCase()}" - Submitting...`;
+        setTimeout(submitLetter, 500);
+      } else {
+        micStatusText.textContent = `Could not recognize a valid letter. Try again.`;
+        setTimeout(() => {
+          micStatusText.textContent = 'Microphone is ready. Say a letter...';
+        }, 2000);
+      }
+    };
+    
+    recognition.onerror = (event) => {
+      console.error('Speech recognition error:', event.error);
+      micStatusText.textContent = `Error: ${event.error}. Try again.`;
+      isListening = false;
+      micToggleBtn.textContent = '🎤 Mic';
+      setTimeout(() => {
+        micStatusText.textContent = 'Microphone is ready. Say a letter...';
+      }, 2000);
+    };
+    
+    recognition.onend = () => {
+      isListening = false;
+      micToggleBtn.textContent = '🎤 Mic';
+    };
+  } else {
+    alert('Speech recognition is not supported in your browser. Please use Chrome or Edge for microphone input.');
+    inputMethod = 'keyboard';
+    micStatus.classList.add('hidden');
+    micToggleBtn.classList.remove('mic-active');
+  }
+}
+
+// Toggle microphone
+micToggleBtn.addEventListener('click', () => {
+  if (inputMethod !== 'microphone') {
+    inputMethod = 'microphone';
+    initSpeechRecognition();
+    micStatus.classList.remove('hidden');
+    micToggleBtn.classList.add('mic-active');
+    micStatusText.textContent = 'Microphone is ready. Say a letter...';
+  } else {
+    if (isListening) {
+      // Stop listening
+      if (recognition) {
+        recognition.stop();
+      }
+      isListening = false;
+      micToggleBtn.textContent = '🎤 Mic';
+      micStatusText.textContent = 'Microphone stopped.';
+    } else {
+      // Start listening
+      if (recognition) {
+        recognition.start();
+        isListening = true;
+        micToggleBtn.textContent = '⏹️ Stop';
+        micStatusText.textContent = 'Listening... Say a letter.';
+      }
+    }
+  }
+});
 
 function renderPlayers() {
   const container = document.getElementById('playersContainer');
@@ -247,7 +358,7 @@ function renderPlayers() {
   active.forEach((player, idx) => {
     if (!player.eliminated) {
       const playerCard = document.createElement('div');
-      playerCard.className = `player-card bg-gradient-to-br from-purple-600/80 to-indigo-700/80 rounded-xl p-3 text-white ${idx === currentIndex ? 'current-player-glow scale-105' : ''}`;
+      playerCard.className = `player-card bg-gradient-to-br from-blue-600/80 to-teal-700/80 rounded-xl p-3 text-white ${idx === currentIndex ? 'current-player-glow scale-105' : ''}`;
       
       // Add timer effect when time is low
       let timerEffect = '';
@@ -312,7 +423,7 @@ function renderCompletedWords() {
   
   completedWords.forEach(word => {
     const wordSpan = document.createElement('span');
-    wordSpan.className = 'bg-gradient-to-r from-green-500 to-emerald-500 text-white px-2 py-1 rounded-full text-xs font-medium animate__animated animate__fadeIn';
+    wordSpan.className = 'bg-gradient-to-r from-green-500 to-teal-500 text-white px-2 py-1 rounded-full text-xs font-medium animate__animated animate__fadeIn';
     wordSpan.textContent = word;
     completedWordsList.appendChild(wordSpan);
   });
@@ -338,7 +449,7 @@ function updateUI() {
   } else if (timeLeft <= 5) {
     timerCircle.className = 'timer-circle bg-gradient-to-r from-orange-500 to-red-600 text-white';
   } else {
-    timerCircle.className = 'timer-circle bg-gradient-to-r from-green-500 to-emerald-500 text-white';
+    timerCircle.className = 'timer-circle bg-gradient-to-r from-green-500 to-teal-500 text-white';
   }
   
   // Render all UI components
@@ -490,6 +601,16 @@ function startTurn() {
   input.value = '';
   input.focus();
   
+  // If using microphone, start listening automatically for the current player
+  if (inputMethod === 'microphone' && recognition) {
+    setTimeout(() => {
+      recognition.start();
+      isListening = true;
+      micToggleBtn.textContent = '⏹️ Stop';
+      micStatusText.textContent = `Listening for ${active[currentIndex].name}... Say a letter.`;
+    }, 1000);
+  }
+  
   // Start timer
   clearInterval(timerInterval);
   timerInterval = setInterval(() => {
@@ -499,6 +620,14 @@ function startTurn() {
       clearInterval(timerInterval);
       document.getElementById('statusText').textContent = `⏰ ${active[currentIndex].name} ran out of time!`;
       document.getElementById('statusText').className = 'text-base font-medium bg-orange-500/80 px-3 py-1 rounded-full inline-block animate__animated animate__shakeX';
+      
+      // Stop microphone if listening
+      if (isListening && recognition) {
+        recognition.stop();
+        isListening = false;
+        micToggleBtn.textContent = '🎤 Mic';
+        micStatusText.textContent = 'Time ran out.';
+      }
       
       setTimeout(() => {
         eliminateCurrent();

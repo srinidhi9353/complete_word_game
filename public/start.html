@@ -1,0 +1,191 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Complete the Word - Start</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+  <style>
+    .ocean-bg {
+      background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
+    }
+    .toggle-button {
+      transition: all 0.3s ease;
+    }
+    .toggle-button.active {
+      background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+      box-shadow: 0 0 15px rgba(255, 65, 108, 0.5);
+    }
+    .toggle-button.inactive {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+  </style>
+</head>
+<body class="ocean-bg min-h-screen flex items-center justify-center p-4">
+  <div class="w-full max-w-2xl bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl p-6 md:p-8 border border-white/20">
+    <h1 class="text-3xl md:text-4xl font-bold mb-6 text-center text-white animate__animated animate__fadeInDown">
+      🎯 Complete the Word
+    </h1>
+
+    <!-- Game Rules Section -->
+    <div class="bg-blue-500/20 border-l-4 border-blue-400 p-4 mb-6 rounded-lg animate__animated animate__fadeIn">
+      <h2 class="text-xl font-bold text-white mb-2 flex items-center">
+        <span class="mr-2">📋</span> Game Rules
+      </h2>
+      <ul class="list-disc pl-5 space-y-1 text-blue-100">
+        <li>Players take turns adding one letter to form a valid English word</li>
+        <li>You can continue adding letters even after completing a valid word</li>
+        <li>Elimination occurs only when a letter makes it impossible to form any valid word</li>
+        <li>The last player remaining wins the game</li>
+        <li>Each player has 10 seconds to make their move</li>
+      </ul>
+    </div>
+
+    <div class="space-y-6 animate__animated animate__fadeInUp">
+      <!-- Input Method Selection -->
+      <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+        <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
+          <span class="mr-2">⌨️🎤</span> Choose Input Method
+        </h2>
+        
+        <div class="flex flex-col sm:flex-row gap-4 justify-center mb-6">
+          <button id="keyboardBtn" class="toggle-button active px-8 py-4 bg-gradient-to-r from-pink-500 to-orange-500 text-white rounded-xl font-bold text-lg shadow-lg transform hover:scale-105 flex items-center justify-center">
+            <span class="mr-2">⌨️</span> Keyboard
+          </button>
+          <button id="micBtn" class="toggle-button inactive px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-xl font-bold text-lg shadow-lg transform hover:scale-105 flex items-center justify-center">
+            <span class="mr-2">🎤</span> Microphone
+          </button>
+        </div>
+        
+        <!-- Microphone Instructions -->
+        <div id="micInstructions" class="bg-yellow-500/20 border-l-4 border-yellow-400 p-4 rounded-lg mt-4 hidden">
+          <h3 class="text-lg font-bold text-white mb-2">🎤 Microphone Instructions</h3>
+          <ul class="list-disc pl-5 space-y-1 text-yellow-100">
+            <li>Click "Allow" when prompted to enable microphone access</li>
+            <li>Say a single letter clearly (e.g., "A", "B", "C")</li>
+            <li>Speak slowly and clearly for best recognition</li>
+            <li>If recognition fails, you can retry or switch to keyboard</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Player Setup -->
+      <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+        <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
+          <span class="mr-2">👥</span> Player Setup
+        </h2>
+        
+        <div class="flex flex-col sm:flex-row gap-4 items-center justify-center mb-4">
+          <label class="text-lg font-medium text-white">Number of players:</label>
+          <input id="numPlayers" type="number" min="2" max="8" value="2" class="border-2 border-blue-300 rounded-xl px-4 py-2 text-center w-24 text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white/90" />
+          <button id="setPlayers" class="px-6 py-2 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-xl hover:from-green-600 hover:to-teal-600 transition-all transform hover:scale-105 shadow-md font-bold flex items-center">
+            <span class="mr-2">⚙️</span> Set
+          </button>
+        </div>
+        
+        <div id="namesContainer" class="space-y-4 mb-6"></div>
+      </div>
+
+      <!-- Start Button -->
+      <div class="flex justify-center">
+        <button id="startGame" class="px-10 py-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-2xl text-xl font-bold hover:from-green-600 hover:to-emerald-600 transition-all transform hover:scale-105 shadow-lg flex items-center animate__animated animate__pulse animate__infinite">
+          <span class="mr-2">🎮</span> Start Game
+        </button>
+      </div>
+    </div>
+  </div>
+
+<script>
+// Game state
+let inputMethod = 'keyboard'; // 'keyboard' or 'microphone'
+let recognition = null;
+
+// DOM Elements
+const keyboardBtn = document.getElementById('keyboardBtn');
+const micBtn = document.getElementById('micBtn');
+const micInstructions = document.getElementById('micInstructions');
+const numPlayersInput = document.getElementById('numPlayers');
+const setPlayersBtn = document.getElementById('setPlayers');
+const namesContainer = document.getElementById('namesContainer');
+const startBtn = document.getElementById('startGame');
+
+// Toggle input method
+keyboardBtn.addEventListener('click', () => {
+  inputMethod = 'keyboard';
+  keyboardBtn.classList.add('active');
+  keyboardBtn.classList.remove('inactive');
+  micBtn.classList.add('inactive');
+  micBtn.classList.remove('active');
+  micInstructions.classList.add('hidden');
+});
+
+micBtn.addEventListener('click', () => {
+  inputMethod = 'microphone';
+  micBtn.classList.add('active');
+  micBtn.classList.remove('inactive');
+  keyboardBtn.classList.add('inactive');
+  keyboardBtn.classList.remove('active');
+  micInstructions.classList.remove('hidden');
+  
+  // Initialize speech recognition
+  initSpeechRecognition();
+});
+
+// Initialize speech recognition
+function initSpeechRecognition() {
+  if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+    // Speech recognition is available
+    console.log('Speech recognition is available');
+  } else {
+    alert('Speech recognition is not supported in your browser. Please use Chrome or Edge for microphone input.');
+    // Revert to keyboard
+    inputMethod = 'keyboard';
+    keyboardBtn.classList.add('active');
+    keyboardBtn.classList.remove('inactive');
+    micBtn.classList.add('inactive');
+    micBtn.classList.remove('active');
+    micInstructions.classList.add('hidden');
+  }
+}
+
+// Set players
+setPlayersBtn.addEventListener('click', () => {
+  const n = parseInt(numPlayersInput.value) || 2;
+  if (n < 2 || n > 8) {
+    alert('Please enter between 2 and 8 players');
+    return;
+  }
+  namesContainer.innerHTML = '';
+  for (let i = 0; i < n; i++) {
+    const div = document.createElement('div');
+    div.className = 'flex flex-col sm:flex-row gap-3 items-center justify-center animate__animated animate__fadeIn';
+    div.innerHTML = `
+      <label class="text-white font-medium w-32 text-center sm:text-left">Player ${i+1}:</label>
+      <input class="playerName border-2 border-blue-200 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-48 bg-white/90" value="Player ${i+1}" placeholder="Enter name" />
+    `;
+    namesContainer.appendChild(div);
+  }
+});
+
+// Start game
+startBtn.addEventListener('click', () => {
+  const nameInputs = Array.from(document.querySelectorAll('.playerName'));
+  if (nameInputs.length < 2) { 
+    alert('Need at least 2 players'); 
+    return; 
+  }
+  
+  const players = nameInputs.map(i => i.value.trim() || 'Player');
+  
+  // Redirect to game page with player names and input method as URL parameters
+  const playerNames = players.join(',');
+  window.location.href = `/game.html?players=${encodeURIComponent(playerNames)}&input=${inputMethod}`;
+});
+
+// Initialize
+setPlayersBtn.click();
+initSpeechRecognition();
+</script>
+</body>
+</html>
