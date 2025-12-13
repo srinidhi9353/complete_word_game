@@ -301,6 +301,7 @@ let inputMethod = 'keyboard'; // 'keyboard' or 'microphone'
 let selectedTheme = 'ocean'; // Selected theme
 let recognition = null;
 let isListening = false;
+let autoSubmitEnabled = false; // Flag for auto-submit feature
 
 // DOM Elements
 const currentPlayerName = document.getElementById('currentPlayerName');
@@ -343,6 +344,7 @@ function initGameFromUrl() {
       initSpeechRecognition();
       micStatus.classList.remove('hidden');
       micToggleBtn.classList.add('mic-active');
+      autoSubmitEnabled = true; // Enable auto-submit for microphone input
     }
     
     // Disable input method switching during game
@@ -401,8 +403,15 @@ function initSpeechRecognition() {
       const letter = transcript.charAt(0);
       if (letter.match(/^[a-z]$/)) {
         document.getElementById('letterInput').value = letter;
-        micStatusText.textContent = `Recognized: "${letter.toUpperCase()}" - Submitting...`;
-        setTimeout(submitLetter, 500);
+        micStatusText.textContent = `Recognized: "${letter.toUpperCase()}"`;
+        
+        // Auto-submit if enabled
+        if (autoSubmitEnabled) {
+          micStatusText.textContent += ' - Auto-submitting...';
+          setTimeout(submitLetter, 1000);
+        } else {
+          micStatusText.textContent += ' - Press Submit or say another letter';
+        }
       } else {
         micStatusText.textContent = `Could not recognize a valid letter. Try again.`;
         setTimeout(() => {
@@ -424,6 +433,17 @@ function initSpeechRecognition() {
     recognition.onend = () => {
       isListening = false;
       micToggleBtn.textContent = '🎤 Mic';
+      // Restart recognition if still the current player's turn and using microphone
+      if (autoSubmitEnabled && !document.getElementById('letterInput').disabled) {
+        setTimeout(() => {
+          if (recognition && !isListening) {
+            recognition.start();
+            isListening = true;
+            micToggleBtn.textContent = '⏹️ Stop';
+            micStatusText.textContent = `Listening for ${active[currentIndex].name}... Say a letter.`;
+          }
+        }, 1000);
+      }
     };
   } else {
     alert('Speech recognition is not supported in your browser. Please use Chrome or Edge for microphone input.');
