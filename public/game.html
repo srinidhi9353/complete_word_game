@@ -58,6 +58,9 @@
     .theme-sunset {
       background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
     }
+    .theme-rainbow {
+      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 20%, #96e6a1 40%, #a1c4fd 60%, #c2e9fb 80%, #a1c4fd 100%);
+    }
     .word-container-ocean {
       background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
     }
@@ -73,6 +76,9 @@
     .word-container-sunset {
       background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
     }
+    .word-container-rainbow {
+      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 20%, #96e6a1 40%, #a1c4fd 60%, #c2e9fb 80%, #a1c4fd 100%);
+    }
     .player-card-ocean {
       background: linear-gradient(135deg, #1a2980cc 0%, #26d0cecc 100%);
     }
@@ -87,6 +93,9 @@
     }
     .player-card-sunset {
       background: linear-gradient(135deg, #ff9a9ecc 0%, #fecfefcc 100%);
+    }
+    .player-card-rainbow {
+      background: linear-gradient(135deg, #ff9a9ecc 0%, #fecfefcc 20%, #96e6a1cc 40%, #a1c4fdcc 60%, #c2e9fbcc 80%, #a1c4fdcc 100%);
     }
     .letter-input {
       font-size: 2rem;
@@ -114,27 +123,65 @@
     .mic-active {
       box-shadow: 0 0 15px rgba(255, 65, 108, 0.5);
     }
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+      .game-container {
+        flex-direction: column !important;
+      }
+      .word-display {
+        font-size: 2.5rem !important;
+        min-height: 80px !important;
+      }
+      .timer-circle {
+        width: 50px !important;
+        height: 50px !important;
+        font-size: 1rem !important;
+      }
+      .letter-input {
+        font-size: 1.5rem !important;
+        width: 60px !important;
+        padding: 0.5rem !important;
+      }
+      .btn-responsive {
+        padding: 0.5rem 1rem !important;
+        font-size: 0.875rem !important;
+      }
+    }
+    @media (max-width: 480px) {
+      .word-display {
+        font-size: 2rem !important;
+        min-height: 60px !important;
+      }
+      .letter-input {
+        font-size: 1.25rem !important;
+        width: 50px !important;
+      }
+      .btn-responsive {
+        padding: 0.25rem 0.5rem !important;
+        font-size: 0.75rem !important;
+      }
+    }
   </style>
 </head>
 <body class="theme-ocean min-h-screen flex items-center justify-center p-2">
-  <div class="w-full max-w-4xl bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl p-4 md:p-6 border border-white/20">
-    <h1 class="text-2xl md:text-3xl font-bold mb-4 text-center text-white animate__animated animate__fadeInDown">
+  <div class="w-full max-w-4xl bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl p-3 sm:p-4 md:p-6 border border-white/20">
+    <h1 class="text-xl sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4 text-center text-white animate__animated animate__fadeInDown">
       🎯 Complete the Word
     </h1>
 
     <div id="gameArea" class="animate__animated animate__fadeIn">
-      <div class="flex flex-col lg:flex-row gap-4">
+      <div class="game-container flex flex-col lg:flex-row gap-3 sm:gap-4">
         <!-- Players Panel -->
         <div class="lg:w-1/3">
-          <h2 class="text-lg font-bold text-white mb-3 flex items-center">
+          <h2 class="text-base sm:text-lg font-bold text-white mb-2 sm:mb-3 flex items-center">
             <span class="mr-1">👥</span> Players
           </h2>
-          <div id="playersContainer" class="space-y-3 max-h-64 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-white/30 scrollbar-track-white/10 rounded-lg">
+          <div id="playersContainer" class="space-y-2 sm:space-y-3 max-h-64 overflow-y-auto pr-1 sm:pr-2 scrollbar-thin scrollbar-thumb-white/30 scrollbar-track-white/10 rounded-lg">
             <!-- Player cards will be dynamically inserted here -->
           </div>
           
-          <div class="mt-4">
-            <h3 class="text-lg font-bold text-white mb-2 flex items-center">
+          <div class="mt-3 sm:mt-4">
+            <h3 class="text-base sm:text-lg font-bold text-white mb-2 flex items-center">
               <span class="mr-1">💀</span> Eliminated
             </h3>
             <div id="eliminatedContainer" class="space-y-2">
@@ -146,72 +193,72 @@
 
         <!-- Game Board -->
         <div class="lg:w-2/3">
-          <div class="word-container-ocean p-5 mb-5 relative rounded-16">
-            <div class="absolute top-3 left-3">
-              <div class="text-sm opacity-90">Current Word</div>
+          <div class="word-container-ocean p-3 sm:p-4 mb-3 sm:mb-4 relative rounded-xl sm:rounded-16">
+            <div class="absolute top-2 sm:top-3 left-2 sm:left-3">
+              <div class="text-xs sm:text-sm opacity-90">Current Word</div>
             </div>
             
-            <div class="flex justify-center items-center min-h-20">
-              <div id="currentWord" class="text-4xl md:text-5xl font-bold text-center my-3 font-mono tracking-wider animate__animated animate__pulse">
+            <div class="flex justify-center items-center min-h-16 sm:min-h-20">
+              <div id="currentWord" class="word-display text-3xl sm:text-4xl md:text-5xl font-bold text-center my-2 sm:my-3 font-mono tracking-wider animate__animated animate__pulse">
                 —
               </div>
             </div>
             
-            <div id="statusLine" class="text-center mt-4">
-              <span id="statusText" class="text-base font-medium bg-black/20 px-3 py-1 rounded-full inline-block">Waiting for game to start...</span>
+            <div id="statusLine" class="text-center mt-3 sm:mt-4">
+              <span id="statusText" class="text-sm sm:text-base font-medium bg-black/20 px-2 py-1 sm:px-3 sm:py-1 rounded-full inline-block">Waiting for game to start...</span>
             </div>
           </div>
 
           <!-- Timer and Controls -->
-          <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-5">
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 mb-3 sm:mb-4">
             <div class="flex items-center">
               <div class="timer-circle bg-gradient-to-r from-green-500 to-teal-500 text-white">
                 <span id="timerDisplay">10</span>s
               </div>
-              <div class="ml-3">
-                <div class="text-white font-semibold text-sm" id="currentPlayerName">Player 1</div>
+              <div class="ml-2 sm:ml-3">
+                <div class="text-white font-semibold text-xs sm:text-sm" id="currentPlayerName">Player 1</div>
                 <div class="text-gray-300 text-xs">Your turn!</div>
               </div>
             </div>
             
-            <div class="flex gap-2">
-              <button id="micToggleBtn" class="px-3 py-2 bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-lg hover:from-purple-700 hover:to-indigo-800 transition-all transform hover:scale-105 shadow-lg text-sm font-bold flex items-center" disabled>
+            <div class="flex gap-1 sm:gap-2">
+              <button id="micToggleBtn" class="px-2 py-1 sm:px-3 sm:py-2 bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-lg hover:from-purple-700 hover:to-indigo-800 transition-all transform hover:scale-105 shadow-lg text-xs sm:text-sm font-bold flex items-center btn-responsive" disabled>
                 <span class="mr-1">🎤</span> Mic
               </button>
-              <button id="restartBtn" class="px-3 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition-all transform hover:scale-105 shadow-lg text-sm font-bold flex items-center">
+              <button id="restartBtn" class="px-2 py-1 sm:px-3 sm:py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition-all transform hover:scale-105 shadow-lg text-xs sm:text-sm font-bold flex items-center btn-responsive">
                 <span class="mr-1">🔄</span> Restart
               </button>
             </div>
           </div>
 
           <!-- Input Section -->
-          <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 mb-4">
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
-              <div class="text-white font-bold text-base">Enter a letter:</div>
-              <input id="letterInput" maxlength="1" class="letter-input border-2 border-white/40 rounded-xl px-5 py-4 text-center w-20 bg-white/90 focus:outline-none focus:ring-2 focus:ring-white/50 shadow-lg" placeholder="A" />
-              <button id="submitLetter" class="px-5 py-4 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-xl text-base font-bold hover:from-green-600 hover:to-teal-600 transition-all transform hover:scale-105 shadow-lg flex items-center">
+          <div class="bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20 mb-3 sm:mb-4">
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3">
+              <div class="text-white font-bold text-sm sm:text-base">Enter a letter:</div>
+              <input id="letterInput" maxlength="1" class="letter-input border-2 border-white/40 rounded-xl px-3 py-2 sm:px-5 sm:py-4 text-center w-16 sm:w-20 bg-white/90 focus:outline-none focus:ring-2 focus:ring-white/50 shadow-lg" placeholder="A" />
+              <button id="submitLetter" class="px-3 py-2 sm:px-5 sm:py-4 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-xl text-sm sm:text-base font-bold hover:from-green-600 hover:to-teal-600 transition-all transform hover:scale-105 shadow-lg flex items-center btn-responsive">
                 <span class="mr-1">✅</span> Submit
               </button>
             </div>
-            <div class="text-center mt-2 text-gray-300 text-sm">
+            <div class="text-center mt-2 text-gray-300 text-xs sm:text-sm">
               Press Enter to submit your letter
             </div>
           </div>
 
           <!-- Microphone Status -->
-          <div id="micStatus" class="bg-yellow-500/20 border-l-4 border-yellow-400 p-3 rounded-lg mb-4 hidden">
+          <div id="micStatus" class="bg-yellow-500/20 border-l-4 border-yellow-400 p-2 sm:p-3 rounded-lg mb-3 sm:mb-4 hidden">
             <div class="flex items-center">
-              <span class="mr-2">🎤</span>
-              <span id="micStatusText" class="text-yellow-100">Microphone is ready. Say a letter...</span>
+              <span class="mr-1 sm:mr-2">🎤</span>
+              <span id="micStatusText" class="text-yellow-100 text-xs sm:text-sm">Microphone is ready. Say a letter...</span>
             </div>
           </div>
 
           <!-- Completed Words -->
-          <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-            <h3 class="text-lg font-bold text-white mb-2 flex items-center">
+          <div class="bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20">
+            <h3 class="text-base sm:text-lg font-bold text-white mb-2 flex items-center">
               <span class="mr-1">✅</span> Completed Words
             </h3>
-            <div id="completedWordsContainer" class="min-h-12">
+            <div id="completedWordsContainer" class="min-h-10 sm:min-h-12">
               <div id="noCompletedWords" class="text-gray-300 text-sm italic">No words completed yet</div>
               <div id="completedWordsList" class="flex flex-wrap gap-1 mt-1 hidden">
                 <!-- Completed words will be dynamically inserted here -->
@@ -315,7 +362,7 @@ function applyTheme(theme) {
   // Update word container
   const wordContainer = document.querySelector('[class^="word-container"]');
   if (wordContainer) {
-    wordContainer.className = `word-container-${theme} p-5 mb-5 relative rounded-16`;
+    wordContainer.className = `word-container-${theme} p-3 sm:p-4 mb-3 sm:mb-4 relative rounded-xl sm:rounded-16`;
   }
   
   // Update timer circle
@@ -328,11 +375,11 @@ function applyTheme(theme) {
   const buttons = document.querySelectorAll('button');
   buttons.forEach(button => {
     if (button.id === 'submitLetter') {
-      button.className = 'px-5 py-4 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-xl text-base font-bold hover:from-green-600 hover:to-teal-600 transition-all transform hover:scale-105 shadow-lg flex items-center';
+      button.className = 'px-3 py-2 sm:px-5 sm:py-4 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-xl text-sm sm:text-base font-bold hover:from-green-600 hover:to-teal-600 transition-all transform hover:scale-105 shadow-lg flex items-center btn-responsive';
     } else if (button.id === 'micToggleBtn') {
-      button.className = 'px-3 py-2 bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-lg hover:from-purple-700 hover:to-indigo-800 transition-all transform hover:scale-105 shadow-lg text-sm font-bold flex items-center';
+      button.className = 'px-2 py-1 sm:px-3 sm:py-2 bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-lg hover:from-purple-700 hover:to-indigo-800 transition-all transform hover:scale-105 shadow-lg text-xs sm:text-sm font-bold flex items-center btn-responsive';
     } else if (button.id === 'restartBtn') {
-      button.className = 'px-3 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition-all transform hover:scale-105 shadow-lg text-sm font-bold flex items-center';
+      button.className = 'px-2 py-1 sm:px-3 sm:py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition-all transform hover:scale-105 shadow-lg text-xs sm:text-sm font-bold flex items-center btn-responsive';
     }
   });
 }
@@ -399,7 +446,7 @@ function renderPlayers() {
   active.forEach((player, idx) => {
     if (!player.eliminated) {
       const playerCard = document.createElement('div');
-      playerCard.className = `player-card-${selectedTheme} rounded-xl p-3 text-white ${idx === currentIndex ? 'current-player-glow scale-105' : ''}`;
+      playerCard.className = `player-card-${selectedTheme} rounded-xl p-2 sm:p-3 text-white ${idx === currentIndex ? 'current-player-glow scale-105' : ''}`;
       
       // Add timer effect when time is low
       let timerEffect = '';
@@ -413,8 +460,8 @@ function renderPlayers() {
       
       playerCard.innerHTML = `
         <div class="flex items-center justify-between">
-          <div class="font-bold text-base">${player.name}</div>
-          <div class="${timerEffect} px-2 py-1 rounded-full text-xs font-bold">
+          <div class="font-bold text-sm sm:text-base truncate max-w-[120px]">${player.name}</div>
+          <div class="${timerEffect} px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-full text-xs font-bold">
             ${timeLeft}s
           </div>
         </div>
@@ -441,10 +488,10 @@ function renderEliminated() {
   
   eliminatedPlayers.forEach(player => {
     const eliminatedCard = document.createElement('div');
-    eliminatedCard.className = `bg-gradient-to-r from-red-600/80 to-red-800/80 rounded-lg p-2 text-white flex items-center text-sm`;
+    eliminatedCard.className = `bg-gradient-to-r from-red-600/80 to-red-800/80 rounded-lg p-2 text-white flex items-center text-xs sm:text-sm`;
     eliminatedCard.innerHTML = `
       <span class="mr-1">💀</span>
-      <span class="font-semibold">${player.name}</span>
+      <span class="font-semibold truncate max-w-[100px]">${player.name}</span>
       <span class="ml-auto text-xs">Eliminated</span>
     `;
     container.appendChild(eliminatedCard);
@@ -473,7 +520,7 @@ function renderCompletedWords() {
 function updateUI() {
   document.getElementById('currentWord').textContent = currentWord || '—';
   document.getElementById('statusText').textContent = 'Waiting for input...';
-  document.getElementById('statusText').className = 'text-base font-medium bg-black/20 px-3 py-1 rounded-full inline-block';
+  document.getElementById('statusText').className = 'text-sm sm:text-base font-medium bg-black/20 px-2 py-1 sm:px-3 sm:py-1 rounded-full inline-block';
   
   // Update timer
   timerDisplay.textContent = timeLeft;
@@ -507,7 +554,7 @@ async function submitLetter() {
   if (!v.match(/^[a-z]$/)) { 
     console.log('Invalid input - not a single letter');
     document.getElementById('statusText').textContent = '⚠️ Please enter a single letter!';
-    document.getElementById('statusText').className = 'text-base font-medium bg-red-500/80 px-3 py-1 rounded-full inline-block animate__animated animate__shakeX';
+    document.getElementById('statusText').className = 'text-sm sm:text-base font-medium bg-red-500/80 px-2 py-1 sm:px-3 sm:py-1 rounded-full inline-block animate__animated animate__shakeX';
     
     // Shake animation for input
     const letterInput = document.getElementById('letterInput');
@@ -518,7 +565,7 @@ async function submitLetter() {
     
     setTimeout(() => {
       document.getElementById('statusText').textContent = 'Waiting for input...';
-      document.getElementById('statusText').className = 'text-base font-medium bg-black/20 px-3 py-1 rounded-full inline-block';
+      document.getElementById('statusText').className = 'text-sm sm:text-base font-medium bg-black/20 px-2 py-1 sm:px-3 sm:py-1 rounded-full inline-block';
     }, 2000);
     return; 
   }
@@ -548,14 +595,14 @@ async function submitLetter() {
       if (!completedWords.includes(newWord.toUpperCase())) {
         completedWords.push(newWord.toUpperCase());
         statusText.textContent = `🎉 "${newWord.toUpperCase()}" is a complete word!`;
-        statusText.className = 'text-base font-medium bg-green-500/80 px-3 py-1 rounded-full inline-block animate__animated animate__tada';
+        statusText.className = 'text-sm sm:text-base font-medium bg-green-500/80 px-2 py-1 sm:px-3 sm:py-1 rounded-full inline-block animate__animated animate__tada';
       } else {
         statusText.textContent = `✅ "${newWord.toUpperCase()}" continues...`;
-        statusText.className = 'text-base font-medium bg-blue-500/80 px-3 py-1 rounded-full inline-block animate__animated animate__fadeIn';
+        statusText.className = 'text-sm sm:text-base font-medium bg-blue-500/80 px-2 py-1 sm:px-3 sm:py-1 rounded-full inline-block animate__animated animate__fadeIn';
       }
     } else {
       statusText.textContent = `✅ "${newWord}" is valid`;
-      statusText.className = 'text-base font-medium bg-blue-500/80 px-3 py-1 rounded-full inline-block animate__animated animate__fadeIn';
+      statusText.className = 'text-sm sm:text-base font-medium bg-blue-500/80 px-2 py-1 sm:px-3 sm:py-1 rounded-full inline-block animate__animated animate__fadeIn';
     }
     
     console.log('Accepted letter, new word:', currentWord);
@@ -568,7 +615,7 @@ async function submitLetter() {
     // Invalid letter - eliminate the current player
     console.log('Invalid letter:', v, 'eliminating player');
     statusText.textContent = `💥 "${newWord}" cannot form any valid word - ${active[currentIndex].name} is eliminated!`;
-    statusText.className = 'text-base font-medium bg-red-600/80 px-3 py-1 rounded-full inline-block animate__animated animate__shakeX';
+    statusText.className = 'text-sm sm:text-base font-medium bg-red-600/80 px-2 py-1 sm:px-3 sm:py-1 rounded-full inline-block animate__animated animate__shakeX';
     
     setTimeout(() => {
       eliminateCurrent();
@@ -584,7 +631,7 @@ function eliminateCurrent() {
   
   if (remaining.length === 1) {
     document.getElementById('statusText').textContent = `🏆 ${remaining[0].name} wins the game!`;
-    document.getElementById('statusText').className = 'text-lg font-bold bg-gradient-to-r from-yellow-400 to-yellow-600 text-black px-4 py-2 rounded-full inline-block animate__animated animate__tada win-animation';
+    document.getElementById('statusText').className = 'text-base sm:text-lg font-bold bg-gradient-to-r from-yellow-400 to-yellow-600 text-black px-3 py-1 sm:px-4 sm:py-2 rounded-full inline-block animate__animated animate__tada win-animation';
     
     // Disable further input
     document.getElementById('letterInput').disabled = true;
@@ -660,7 +707,7 @@ function startTurn() {
     if (timeLeft <= 0) {
       clearInterval(timerInterval);
       document.getElementById('statusText').textContent = `⏰ ${active[currentIndex].name} ran out of time!`;
-      document.getElementById('statusText').className = 'text-base font-medium bg-orange-500/80 px-3 py-1 rounded-full inline-block animate__animated animate__shakeX';
+      document.getElementById('statusText').className = 'text-sm sm:text-base font-medium bg-orange-500/80 px-2 py-1 sm:px-3 sm:py-1 rounded-full inline-block animate__animated animate__shakeX';
       
       // Stop microphone if listening
       if (isListening && recognition) {

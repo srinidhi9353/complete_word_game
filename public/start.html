@@ -22,11 +22,15 @@
     .theme-sunset {
       background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
     }
+    .theme-rainbow {
+      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 20%, #96e6a1 40%, #a1c4fd 60%, #c2e9fb 80%, #a1c4fd 100%);
+    }
     .toggle-button {
       transition: all 0.3s ease;
     }
     .toggle-button.active {
       box-shadow: 0 0 15px rgba(255, 65, 108, 0.5);
+      transform: scale(1.05);
     }
     .toggle-button.inactive {
       opacity: 0.7;
@@ -34,20 +38,34 @@
     .toggle-button.inactive:hover {
       opacity: 1;
     }
+    /* Responsive adjustments */
+    @media (max-width: 640px) {
+      .theme-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+      }
+      .btn-large {
+        padding: 0.5rem 1rem !important;
+        font-size: 0.875rem !important;
+      }
+      .btn-small {
+        padding: 0.25rem 0.5rem !important;
+        font-size: 0.75rem !important;
+      }
+    }
   </style>
 </head>
-<body class="theme-ocean min-h-screen flex items-center justify-center p-4">
-  <div class="w-full max-w-2xl bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl p-6 md:p-8 border border-white/20">
-    <h1 class="text-3xl md:text-4xl font-bold mb-6 text-center text-white animate__animated animate__fadeInDown">
+<body class="theme-ocean min-h-screen flex items-center justify-center p-2 sm:p-4">
+  <div class="w-full max-w-2xl bg-white/10 backdrop-blur-lg rounded-2xl sm:rounded-3xl shadow-2xl p-4 sm:p-6 md:p-8 border border-white/20">
+    <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6 text-center text-white animate__animated animate__fadeInDown">
       🎯 Complete the Word
     </h1>
 
     <!-- Game Rules Section -->
-    <div class="bg-white/20 border-l-4 border-white/40 p-4 mb-6 rounded-lg animate__animated animate__fadeIn">
-      <h2 class="text-xl font-bold text-white mb-2 flex items-center">
+    <div class="bg-white/20 border-l-4 border-white/40 p-3 sm:p-4 mb-4 sm:mb-6 rounded-lg animate__animated animate__fadeIn">
+      <h2 class="text-lg sm:text-xl font-bold text-white mb-2 flex items-center">
         <span class="mr-2">📋</span> Game Rules
       </h2>
-      <ul class="list-disc pl-5 space-y-1 text-white/90">
+      <ul class="list-disc pl-5 space-y-1 text-white/90 text-sm sm:text-base">
         <li>Players take turns adding one letter to form a valid English word</li>
         <li>You can continue adding letters even after completing a valid word</li>
         <li>Elimination occurs only when a letter makes it impossible to form any valid word</li>
@@ -56,56 +74,60 @@
       </ul>
     </div>
 
-    <div class="space-y-6 animate__animated animate__fadeInUp">
+    <div class="space-y-4 sm:space-y-6 animate__animated animate__fadeInUp">
       <!-- Theme Selection -->
-      <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-        <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
+      <div class="bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/20">
+        <h2 class="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4 flex items-center">
           <span class="mr-2">🎨</span> Choose Theme
         </h2>
         
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
-          <button data-theme="ocean" class="theme-btn active px-3 py-2 bg-gradient-to-r from-blue-600 to-teal-500 text-white rounded-lg font-bold text-sm shadow-lg transform hover:scale-105 flex flex-col items-center justify-center h-16">
-            <span class="text-lg">🌊</span>
+        <div class="theme-grid grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
+          <button data-theme="ocean" class="theme-btn active px-2 py-3 sm:px-3 sm:py-4 bg-gradient-to-r from-blue-600 to-teal-500 text-white rounded-lg font-bold text-xs sm:text-sm shadow-lg transform hover:scale-105 flex flex-col items-center justify-center h-14 sm:h-16">
+            <span class="text-lg sm:text-xl">🌊</span>
             <span>Ocean</span>
           </button>
-          <button data-theme="fire" class="theme-btn inactive px-3 py-2 bg-gradient-to-r from-red-600 to-orange-500 text-white rounded-lg font-bold text-sm shadow-lg transform hover:scale-105 flex flex-col items-center justify-center h-16">
-            <span class="text-lg">🔥</span>
+          <button data-theme="fire" class="theme-btn inactive px-2 py-3 sm:px-3 sm:py-4 bg-gradient-to-r from-red-600 to-orange-500 text-white rounded-lg font-bold text-xs sm:text-sm shadow-lg transform hover:scale-105 flex flex-col items-center justify-center h-14 sm:h-16">
+            <span class="text-lg sm:text-xl">🔥</span>
             <span>Fire</span>
           </button>
-          <button data-theme="forest" class="theme-btn inactive px-3 py-2 bg-gradient-to-r from-green-600 to-emerald-500 text-white rounded-lg font-bold text-sm shadow-lg transform hover:scale-105 flex flex-col items-center justify-center h-16">
-            <span class="text-lg">🌲</span>
+          <button data-theme="forest" class="theme-btn inactive px-2 py-3 sm:px-3 sm:py-4 bg-gradient-to-r from-green-600 to-emerald-500 text-white rounded-lg font-bold text-xs sm:text-sm shadow-lg transform hover:scale-105 flex flex-col items-center justify-center h-14 sm:h-16">
+            <span class="text-lg sm:text-xl">🌲</span>
             <span>Forest</span>
           </button>
-          <button data-theme="purple" class="theme-btn inactive px-3 py-2 bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-lg font-bold text-sm shadow-lg transform hover:scale-105 flex flex-col items-center justify-center h-16">
-            <span class="text-lg">💜</span>
+          <button data-theme="purple" class="theme-btn inactive px-2 py-3 sm:px-3 sm:py-4 bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-lg font-bold text-xs sm:text-sm shadow-lg transform hover:scale-105 flex flex-col items-center justify-center h-14 sm:h-16">
+            <span class="text-lg sm:text-xl">💜</span>
             <span>Purple</span>
           </button>
-          <button data-theme="sunset" class="theme-btn inactive px-3 py-2 bg-gradient-to-r from-pink-500 to-orange-400 text-white rounded-lg font-bold text-sm shadow-lg transform hover:scale-105 flex flex-col items-center justify-center h-16">
-            <span class="text-lg">🌅</span>
+          <button data-theme="sunset" class="theme-btn inactive px-2 py-3 sm:px-3 sm:py-4 bg-gradient-to-r from-pink-500 to-orange-400 text-white rounded-lg font-bold text-xs sm:text-sm shadow-lg transform hover:scale-105 flex flex-col items-center justify-center h-14 sm:h-16">
+            <span class="text-lg sm:text-xl">🌅</span>
             <span>Sunset</span>
+          </button>
+          <button data-theme="rainbow" class="theme-btn inactive px-2 py-3 sm:px-3 sm:py-4 bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 text-white rounded-lg font-bold text-xs sm:text-sm shadow-lg transform hover:scale-105 flex flex-col items-center justify-center h-14 sm:h-16">
+            <span class="text-lg sm:text-xl">🌈</span>
+            <span>Rainbow</span>
           </button>
         </div>
       </div>
 
       <!-- Input Method Selection -->
-      <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-        <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
+      <div class="bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/20">
+        <h2 class="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4 flex items-center">
           <span class="mr-2">⌨️🎤</span> Choose Input Method
         </h2>
         
-        <div class="flex flex-col sm:flex-row gap-4 justify-center mb-6">
-          <button id="keyboardBtn" class="toggle-button active px-8 py-4 bg-gradient-to-r from-blue-500 to-teal-500 text-white rounded-xl font-bold text-lg shadow-lg transform hover:scale-105 flex items-center justify-center">
+        <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-4 sm:mb-6">
+          <button id="keyboardBtn" class="toggle-button active px-6 py-3 sm:px-8 sm:py-4 bg-gradient-to-r from-blue-500 to-teal-500 text-white rounded-xl font-bold text-base sm:text-lg shadow-lg flex items-center justify-center btn-large">
             <span class="mr-2">⌨️</span> Keyboard
           </button>
-          <button id="micBtn" class="toggle-button inactive px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-xl font-bold text-lg shadow-lg transform hover:scale-105 flex items-center justify-center">
+          <button id="micBtn" class="toggle-button inactive px-6 py-3 sm:px-8 sm:py-4 bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-xl font-bold text-base sm:text-lg shadow-lg flex items-center justify-center btn-large">
             <span class="mr-2">🎤</span> Microphone
           </button>
         </div>
         
         <!-- Microphone Instructions -->
-        <div id="micInstructions" class="bg-yellow-500/20 border-l-4 border-yellow-400 p-4 rounded-lg mt-4 hidden">
-          <h3 class="text-lg font-bold text-white mb-2">🎤 Microphone Instructions</h3>
-          <ul class="list-disc pl-5 space-y-1 text-yellow-100">
+        <div id="micInstructions" class="bg-yellow-500/20 border-l-4 border-yellow-400 p-3 sm:p-4 rounded-lg mt-3 sm:mt-4 hidden">
+          <h3 class="text-base sm:text-lg font-bold text-white mb-2">🎤 Microphone Instructions</h3>
+          <ul class="list-disc pl-5 space-y-1 text-yellow-100 text-xs sm:text-sm">
             <li>Click "Allow" when prompted to enable microphone access</li>
             <li>Say a single letter clearly (e.g., "A", "B", "C")</li>
             <li>Speak slowly and clearly for best recognition</li>
@@ -115,25 +137,25 @@
       </div>
 
       <!-- Player Setup -->
-      <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-        <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
+      <div class="bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/20">
+        <h2 class="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4 flex items-center">
           <span class="mr-2">👥</span> Player Setup
         </h2>
         
-        <div class="flex flex-col sm:flex-row gap-4 items-center justify-center mb-4">
-          <label class="text-lg font-medium text-white">Number of players:</label>
-          <input id="numPlayers" type="number" min="2" max="8" value="2" class="border-2 border-white/30 rounded-xl px-4 py-2 text-center w-24 text-lg focus:outline-none focus:ring-2 focus:ring-white/50 bg-white/90" />
-          <button id="setPlayers" class="px-6 py-2 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-xl hover:from-green-600 hover:to-teal-600 transition-all transform hover:scale-105 shadow-md font-bold flex items-center">
-            <span class="mr-2">⚙️</span> Set
+        <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center justify-center mb-3 sm:mb-4">
+          <label class="text-base sm:text-lg font-medium text-white">Number of players:</label>
+          <input id="numPlayers" type="number" min="2" max="8" value="2" class="border-2 border-white/30 rounded-xl px-3 py-2 sm:px-4 sm:py-2 text-center w-20 sm:w-24 text-base sm:text-lg focus:outline-none focus:ring-2 focus:ring-white/50 bg-white/90" />
+          <button id="setPlayers" class="px-4 py-2 sm:px-6 sm:py-2 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-xl hover:from-green-600 hover:to-teal-600 transition-all transform hover:scale-105 shadow-md font-bold flex items-center btn-small">
+            <span class="mr-1 sm:mr-2">⚙️</span> Set
           </button>
         </div>
         
-        <div id="namesContainer" class="space-y-4 mb-6"></div>
+        <div id="namesContainer" class="space-y-3 sm:space-y-4 mb-4 sm:mb-6"></div>
       </div>
 
       <!-- Start Button -->
       <div class="flex justify-center">
-        <button id="startGame" class="px-10 py-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-2xl text-xl font-bold hover:from-green-600 hover:to-emerald-600 transition-all transform hover:scale-105 shadow-lg flex items-center animate__animated animate__pulse animate__infinite">
+        <button id="startGame" class="px-8 py-3 sm:px-10 sm:py-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-2xl text-xl sm:text-2xl font-bold hover:from-green-600 hover:to-emerald-600 transition-all transform hover:scale-105 shadow-lg flex items-center animate__animated animate__pulse animate__infinite btn-large">
           <span class="mr-2">🎮</span> Start Game
         </button>
       </div>
@@ -173,7 +195,7 @@ themeButtons.forEach(btn => {
     selectedTheme = btn.getAttribute('data-theme');
     
     // Change body background
-    document.body.className = `theme-${selectedTheme} min-h-screen flex items-center justify-center p-4`;
+    document.body.className = `theme-${selectedTheme} min-h-screen flex items-center justify-center p-2 sm:p-4`;
   });
 });
 
@@ -228,8 +250,8 @@ setPlayersBtn.addEventListener('click', () => {
     const div = document.createElement('div');
     div.className = 'flex flex-col sm:flex-row gap-3 items-center justify-center animate__animated animate__fadeIn';
     div.innerHTML = `
-      <label class="text-white font-medium w-32 text-center sm:text-left">Player ${i+1}:</label>
-      <input class="playerName border-2 border-white/30 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-white/50 w-48 bg-white/90" value="Player ${i+1}" placeholder="Enter name" />
+      <label class="text-white font-medium w-28 sm:w-32 text-center sm:text-left text-sm sm:text-base">Player ${i+1}:</label>
+      <input class="playerName border-2 border-white/30 rounded-xl px-3 py-2 sm:px-4 sm:py-2 focus:outline-none focus:ring-2 focus:ring-white/50 w-full sm:w-48 bg-white/90 text-sm sm:text-base" value="Player ${i+1}" placeholder="Enter name" />
     `;
     namesContainer.appendChild(div);
   }
