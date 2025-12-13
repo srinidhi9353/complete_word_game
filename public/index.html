@@ -5,126 +5,51 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Complete the Word - Multiplayer</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
   <style>
-    @keyframes blink {
-      0% { opacity: 1; }
-      50% { opacity: 0.3; }
-      100% { opacity: 1; }
-    }
-    .blink {
-      animation: blink 1s infinite;
-    }
-    .current-player {
-      transform: scale(1.05);
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    }
-    .player-card {
-      transition: all 0.3s ease;
-    }
-    .word-container {
+    .gradient-bg {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border-radius: 16px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
     }
   </style>
 </head>
 <body class="bg-gradient-to-br from-purple-50 to-blue-100 min-h-screen flex items-center justify-center p-4 md:p-6">
-  <div class="w-full max-w-4xl bg-white rounded-3xl shadow-xl p-6 md:p-8">
-    <h1 class="text-3xl md:text-4xl font-bold mb-6 text-center bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent">Complete the Word — Multiplayer</h1>
+  <div class="w-full max-w-2xl bg-white rounded-3xl shadow-xl p-6 md:p-8">
+    <h1 class="text-3xl md:text-4xl font-bold mb-6 text-center bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent animate__animated animate__fadeInDown">
+      🎯 Complete the Word — Multiplayer
+    </h1>
 
     <!-- Game Rules Section -->
-    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 rounded-lg">
-      <h2 class="text-xl font-bold text-yellow-700 mb-2">Game Rules</h2>
+    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 rounded-lg animate__animated animate__fadeIn">
+      <h2 class="text-xl font-bold text-yellow-700 mb-2 flex items-center">
+        <span class="mr-2">📋</span> Game Rules
+      </h2>
       <ul class="list-disc pl-5 space-y-1 text-yellow-700">
         <li>Players take turns adding one letter to form a valid English word</li>
         <li>You can continue adding letters even after completing a valid word</li>
         <li>Elimination occurs only when a letter makes it impossible to form any valid word</li>
-        <li>Starting letters are not restricted for future rounds</li>
         <li>The last player remaining wins the game</li>
+        <li>Each player has 10 seconds to make their move</li>
       </ul>
     </div>
 
-    <div id="setup" class="space-y-6">
+    <div id="setup" class="space-y-6 animate__animated animate__fadeInUp">
       <div class="flex flex-col sm:flex-row gap-4 items-center justify-center">
         <label class="text-lg font-medium text-gray-700">Number of players:</label>
         <input id="numPlayers" type="number" min="2" max="8" value="2" class="border-2 border-purple-300 rounded-xl px-4 py-2 text-center w-24 text-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
-        <button id="setPlayers" class="px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:from-purple-700 hover:to-indigo-700 transition-all transform hover:scale-105 shadow-md">Set</button>
+        <button id="setPlayers" class="px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:from-purple-700 hover:to-indigo-700 transition-all transform hover:scale-105 shadow-md font-bold flex items-center">
+          <span class="mr-2">⚙️</span> Set
+        </button>
       </div>
       <div id="namesContainer" class="space-y-4"></div>
       <div class="flex justify-center">
-        <button id="startGame" class="px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl text-lg font-semibold hover:from-green-600 hover:to-emerald-600 transition-all transform hover:scale-105 shadow-lg">Start Game</button>
-      </div>
-    </div>
-
-    <div id="gameArea" class="hidden">
-      <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-        <div id="playersWrap" class="flex flex-wrap gap-3 justify-center md:justify-start"></div>
-        <div class="text-right">
-          <button id="restartBtn" class="px-4 py-2 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-lg hover:from-red-600 hover:to-orange-600 transition-all shadow-md">Restart</button>
-        </div>
-      </div>
-
-      <div class="flex flex-col items-center justify-center mb-8">
-        <div class="word-container w-full max-w-md py-8 px-6 mb-6 relative">
-          <div class="text-xl md:text-2xl font-semibold text-center mb-4 opacity-90">Current Word</div>
-          <div id="currentWord" class="text-5xl md:text-6xl font-bold text-center my-4 font-mono tracking-wider">—</div>
-          <div id="statusLine" class="text-center mt-4">
-            <span id="statusText" class="text-lg font-medium">—</span>
-          </div>
-          
-          <!-- Center Timer -->
-          <div id="centerTimer" class="absolute top-4 right-4 text-2xl font-bold blink hidden"></div>
-        </div>
-        
-        <div id="letterInputWrap" class="flex flex-col sm:flex-row items-center gap-3">
-          <input id="letterInput" maxlength="1" class="border-2 border-purple-300 rounded-xl px-6 py-4 text-center text-3xl font-bold w-24 focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-md" placeholder="A" />
-          <button id="submitLetter" class="px-6 py-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl text-xl font-bold hover:from-blue-600 hover:to-cyan-600 transition-all transform hover:scale-105 shadow-lg">Enter</button>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-        <div class="bg-red-50 rounded-xl p-5 shadow">
-          <h3 class="text-lg font-bold text-red-700 mb-3">Eliminated Players</h3>
-          <ul id="elimList" class="list-disc pl-5 space-y-1 text-red-600"></ul>
-        </div>
-        <div class="bg-green-50 rounded-xl p-5 shadow">
-          <h3 class="text-lg font-bold text-green-700 mb-3">Completed Words</h3>
-          <ul id="usedList" class="list-disc pl-5 space-y-1 text-green-600 max-h-40 overflow-y-auto"></ul>
-        </div>
+        <button id="startGame" class="px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl text-lg font-bold hover:from-green-600 hover:to-emerald-600 transition-all transform hover:scale-105 shadow-lg flex items-center">
+          <span class="mr-2">🎮</span> Start Game
+        </button>
       </div>
     </div>
   </div>
 
 <script>
-const apiCheck = async (current) => {
-  try {
-    const res = await fetch('/api/check', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ current })
-    });
-    if (!res.ok) {
-      console.error('API request failed with status:', res.status);
-      return { isWord: false, canContinue: false };
-    }
-    return res.json();
-  } catch (error) {
-    console.error('API request failed with error:', error);
-    return { isWord: false, canContinue: false };
-  }
-}
-
-let players = [];
-let active = [];
-let currentIndex = 0;
-let currentWord = '';
-let usedWords = new Set();
-let timerInterval = null;
-let timeLeft = 10;
-let roundNumber = 1;
-
 const numPlayersInput = document.getElementById('numPlayers');
 const setPlayersBtn = document.getElementById('setPlayers');
 const namesContainer = document.getElementById('namesContainer');
@@ -137,9 +62,9 @@ setPlayersBtn.addEventListener('click', () => {
     return;
   }
   namesContainer.innerHTML = '';
-  for (let i=0;i<n;i++) {
+  for (let i = 0; i < n; i++) {
     const div = document.createElement('div');
-    div.className = 'flex flex-col sm:flex-row gap-3 items-center justify-center';
+    div.className = 'flex flex-col sm:flex-row gap-3 items-center justify-center animate__animated animate__fadeIn';
     div.innerHTML = `
       <label class="text-gray-700 font-medium w-32 text-center sm:text-left">Player ${i+1}:</label>
       <input class="playerName border-2 border-purple-200 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 w-48" value="Player ${i+1}" placeholder="Enter name" />
@@ -150,227 +75,16 @@ setPlayersBtn.addEventListener('click', () => {
 
 startBtn.addEventListener('click', () => {
   const nameInputs = Array.from(document.querySelectorAll('.playerName'));
-  if (nameInputs.length < 2) { alert('Need at least 2 players'); return; }
-  players = nameInputs.map(i => i.value.trim()||'Player');
-  active = players.map((p, idx) => ({ name: p, eliminated: false, index: idx }));
-  document.getElementById('setup').classList.add('hidden');
-  document.getElementById('gameArea').classList.remove('hidden');
-  renderPlayers();
-  currentIndex = 0;
-  currentWord = '';
-  usedWords = new Set();
-  roundNumber = 1;
-  updateUI();
-  startTurn();
-});
-
-document.getElementById('restartBtn').addEventListener('click', () => {
-  location.reload();
-});
-
-function renderPlayers() {
-  const wrap = document.getElementById('playersWrap');
-  wrap.innerHTML = '';
-  active.forEach((p, idx) => {
-    const div = document.createElement('div');
-    div.className = 'player-card bg-gradient-to-br from-purple-100 to-indigo-100 rounded-xl p-4 text-center min-w-[120px] shadow';
-    div.id = 'player-'+idx;
-    div.innerHTML = `
-      <div class="font-bold text-lg" id="pname-${idx}">${p.name}</div>
-      <div id="ptimer-${idx}" class="text-sm mt-1 font-medium">10s</div>
-    `;
-    wrap.appendChild(div);
-  });
-}
-
-function updateUI() {
-  console.log('Updating UI, currentWord:', currentWord);
-  document.getElementById('currentWord').textContent = currentWord || '—';
-  document.getElementById('statusText').textContent = '—';
-  document.getElementById('statusText').className = 'text-lg font-medium';
-  document.getElementById('elimList').innerHTML = active.filter(p=>p.eliminated).map(p=>`<li>${p.name}</li>`).join('') || '<li class="text-gray-500">None yet</li>';
-  document.getElementById('usedList').innerHTML = Array.from(usedWords).map(w=>`<li>${w}</li>`).join('') || '<li class="text-gray-500">None yet</li>';
-  
-  // highlight current player and show timer
-  active.forEach((p, idx) => {
-    const el = document.getElementById('player-'+idx);
-    if (!el) return;
-    
-    const timerEl = document.getElementById('ptimer-'+idx);
-    
-    if (idx === currentIndex && !p.eliminated) {
-      el.classList.add('current-player', 'bg-gradient-to-br', 'from-yellow-200', 'to-orange-200');
-      el.classList.remove('from-purple-100', 'to-indigo-100');
-      
-      // Show timer in center
-      const centerTimer = document.getElementById('centerTimer');
-      centerTimer.textContent = timeLeft + 's';
-      centerTimer.classList.remove('hidden');
-      if (timeLeft <= 3) {
-        centerTimer.classList.add('blink', 'text-red-300');
-      } else {
-        centerTimer.classList.remove('blink', 'text-red-300');
-      }
-    } else {
-      el.classList.remove('current-player', 'bg-gradient-to-br', 'from-yellow-200', 'to-orange-200');
-      el.classList.add('from-purple-100', 'to-indigo-100');
-      
-      // Hide center timer for non-current players
-      if (idx !== currentIndex) {
-        const centerTimer = document.getElementById('centerTimer');
-        centerTimer.classList.add('hidden');
-      }
-    }
-    
-    if (timerEl) {
-      timerEl.textContent = p.eliminated ? '❌ Eliminated' : (idx === currentIndex ? timeLeft + 's' : '10s');
-      if (p.eliminated) {
-        timerEl.classList.add('text-red-500', 'font-bold');
-      } else {
-        timerEl.classList.remove('text-red-500', 'font-bold');
-      }
-    }
-  });
-}
-
-async function submitLetter() {
-  const input = document.getElementById('letterInput');
-  const v = (input.value || '').trim().toLowerCase();
-  console.log('Player entered letter:', v);
-  
-  if (!v.match(/^[a-z]$/)) { 
-    console.log('Invalid input - not a single letter');
-    document.getElementById('statusText').textContent = '⚠️ Enter a single letter';
-    document.getElementById('statusText').className = 'text-red-500 font-bold text-lg';
-    setTimeout(() => {
-      document.getElementById('statusText').textContent = '—';
-      document.getElementById('statusText').className = 'text-lg font-medium';
-    }, 2000);
+  if (nameInputs.length < 2) { 
+    alert('Need at least 2 players'); 
     return; 
   }
   
-  // Clear the input field immediately
-  input.value = '';
+  const players = nameInputs.map(i => i.value.trim() || 'Player');
   
-  // Add the letter to the current word
-  const newWord = currentWord + v;
-  console.log('New word:', newWord);
-  
-  // Test if this word can lead to any valid word
-  const resp = await apiCheck(newWord);
-  const statusText = document.getElementById('statusText');
-  
-  console.log('API Response:', resp);
-  console.log('canContinue:', resp.canContinue);
-  
-  // Check if the letter leads to any valid word
-  if (resp.canContinue) {
-    // Valid letter - accept it and move to next player
-    currentWord = newWord;
-    statusText.textContent = `✅ "${currentWord}" can form valid words`;
-    statusText.className = 'text-green-500 font-bold text-lg';
-    console.log('Accepted letter, new word:', currentWord);
-    
-    // Move to next player after a delay
-    setTimeout(() => {
-      nextTurn();
-    }, 1500);
-  } else {
-    // Invalid letter - eliminate the current player
-    console.log('Invalid letter:', v, 'eliminating player');
-    statusText.textContent = `❌ "${newWord}" cannot form any valid word - ${active[currentIndex].name} is eliminated!`;
-    statusText.className = 'text-red-500 font-bold text-lg';
-    setTimeout(() => {
-      eliminateCurrent();
-    }, 2000);
-  }
-}
-
-function eliminateCurrent() {
-  clearInterval(timerInterval);
-  active[currentIndex].eliminated = true;
-  updateUI();
-  const remaining = active.filter(p=>!p.eliminated);
-  
-  if (remaining.length === 1) {
-    document.getElementById('statusText').textContent = `🏆 ${remaining[0].name} wins the game!`;
-    document.getElementById('statusText').className = 'text-2xl font-bold text-yellow-400';
-    // Disable further input
-    document.getElementById('letterInput').disabled = true;
-    document.getElementById('submitLetter').disabled = true;
-    // Clear input field
-    document.getElementById('letterInput').value = '';
-    return;
-  }
-  
-  // Find next active player
-  let nextIndex = -1;
-  for (let i=1; i<=active.length; i++) {
-    const idx = (currentIndex + i) % active.length;
-    if (!active[idx].eliminated) {
-      nextIndex = idx;
-      break;
-    }
-  }
-  
-  if (nextIndex !== -1) {
-    currentIndex = nextIndex;
-    timeLeft = 10;
-    updateUI();
-    setTimeout(() => {
-      startTurn();
-    }, 2000);
-  }
-}
-
-function nextTurn() {
-  clearInterval(timerInterval);
-  
-  // Move to next active player
-  let nextIndex = -1;
-  for (let i=1; i<=active.length; i++) {
-    const idx = (currentIndex + i) % active.length;
-    if (!active[idx].eliminated) {
-      nextIndex = idx;
-      break;
-    }
-  }
-  
-  if (nextIndex !== -1) {
-    currentIndex = nextIndex;
-    timeLeft = 10;
-    updateUI();
-    startTurn();
-  }
-}
-
-function startTurn() {
-  updateUI();
-  const input = document.getElementById('letterInput');
-  // Clear the input field and focus it for the next player
-  input.value = '';
-  input.focus();
-  
-  // Start timer
-  clearInterval(timerInterval);
-  timerInterval = setInterval(() => {
-    timeLeft--;
-    updateUI();
-    if (timeLeft <= 0) {
-      clearInterval(timerInterval);
-      document.getElementById('statusText').textContent = `${active[currentIndex].name} ran out of time!`;
-      document.getElementById('statusText').className = 'text-red-500 font-bold text-lg';
-      setTimeout(() => {
-        alert(`${active[currentIndex].name} ran out of time and is eliminated.`);
-        eliminateCurrent();
-      }, 1000);
-    }
-  }, 1000);
-}
-
-document.getElementById('submitLetter').addEventListener('click', submitLetter);
-document.getElementById('letterInput').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') submitLetter();
+  // Redirect to game page with player names as URL parameters
+  const playerNames = players.join(',');
+  window.location.href = `/game.html?players=${encodeURIComponent(playerNames)}`;
 });
 
 // Initialize sample setup

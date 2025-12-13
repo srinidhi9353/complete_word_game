@@ -1,0 +1,507 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Complete the Word - Game</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+  <style>
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+    .pulse-animation {
+      animation: pulse 2s infinite;
+    }
+    .bounce-animation {
+      animation: bounce 1s infinite;
+    }
+    .shake-animation {
+      animation: shake 0.5s;
+    }
+    .current-player-glow {
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+      border: 2px solid gold;
+    }
+    .word-container {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+    }
+    .player-card {
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    .player-card:hover {
+      transform: translateY(-5px);
+    }
+    .letter-input {
+      font-size: 2.5rem;
+      text-transform: uppercase;
+      font-weight: bold;
+      transition: all 0.2s ease;
+    }
+    .letter-input:focus {
+      transform: scale(1.1);
+      box-shadow: 0 0 20px rgba(102, 126, 234, 0.6);
+    }
+    .timer-circle {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+    .win-animation {
+      animation: bounce 0.5s ease infinite alternate;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800 min-h-screen flex items-center justify-center p-4">
+  <div class="w-full max-w-5xl bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl p-6 md:p-8 border border-white/20">
+    <h1 class="text-4xl md:text-5xl font-bold mb-8 text-center bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-500 bg-clip-text text-transparent animate__animated animate__fadeInDown">
+      🎯 Complete the Word
+    </h1>
+
+    <div id="gameArea" class="animate__animated animate__fadeIn">
+      <div class="flex flex-col lg:flex-row gap-8">
+        <!-- Players Panel -->
+        <div class="lg:w-1/3">
+          <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
+            <span class="mr-2">👥</span> Players
+          </h2>
+          <div id="playersContainer" class="space-y-4 max-h-96 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-purple-500 scrollbar-track-purple-900/50 rounded-lg">
+            <!-- Player cards will be dynamically inserted here -->
+          </div>
+          
+          <div class="mt-6">
+            <h3 class="text-xl font-bold text-white mb-3 flex items-center">
+              <span class="mr-2">💀</span> Eliminated
+            </h3>
+            <div id="eliminatedContainer" class="space-y-2">
+              <div id="noEliminated" class="text-gray-300 italic">No players eliminated yet</div>
+              <!-- Eliminated players will be dynamically inserted here -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Game Board -->
+        <div class="lg:w-2/3">
+          <div class="word-container p-8 mb-8 relative">
+            <div class="absolute top-4 left-4">
+              <div class="text-lg opacity-90">Current Word</div>
+            </div>
+            
+            <div class="flex justify-center items-center min-h-32">
+              <div id="currentWord" class="text-6xl md:text-7xl font-bold text-center my-4 font-mono tracking-wider animate__animated animate__pulse">
+                —
+              </div>
+            </div>
+            
+            <div id="statusLine" class="text-center mt-6">
+              <span id="statusText" class="text-xl font-medium bg-black/20 px-4 py-2 rounded-full inline-block">Waiting for game to start...</span>
+            </div>
+          </div>
+
+          <!-- Timer and Controls -->
+          <div class="flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
+            <div class="flex items-center">
+              <div class="timer-circle bg-gradient-to-r from-red-500 to-orange-500 text-white">
+                <span id="timerDisplay">10</span>s
+              </div>
+              <div class="ml-4">
+                <div class="text-white font-semibold" id="currentPlayerName">Player 1</div>
+                <div class="text-gray-300 text-sm">Your turn!</div>
+              </div>
+            </div>
+            
+            <div class="flex gap-3">
+              <button id="restartBtn" class="px-5 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl hover:from-red-600 hover:to-red-700 transition-all transform hover:scale-105 shadow-lg font-bold flex items-center">
+                <span class="mr-2">🔄</span> Restart
+              </button>
+            </div>
+          </div>
+
+          <!-- Input Section -->
+          <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <div class="text-white font-bold text-lg">Enter a letter:</div>
+              <input id="letterInput" maxlength="1" class="letter-input border-2 border-purple-400 rounded-2xl px-8 py-6 text-center w-24 bg-white/90 focus:outline-none focus:ring-4 focus:ring-purple-500 shadow-lg" placeholder="A" />
+              <button id="submitLetter" class="px-8 py-6 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-2xl text-xl font-bold hover:from-green-600 hover:to-emerald-600 transition-all transform hover:scale-105 shadow-xl flex items-center">
+                <span class="mr-2">✅</span> Submit
+              </button>
+            </div>
+            <div class="text-center mt-4 text-gray-300">
+              Press Enter to submit your letter
+            </div>
+          </div>
+
+          <!-- Completed Words -->
+          <div class="mt-8 bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+            <h3 class="text-2xl font-bold text-white mb-4 flex items-center">
+              <span class="mr-2">✅</span> Completed Words
+            </h3>
+            <div id="completedWordsContainer" class="min-h-16">
+              <div id="noCompletedWords" class="text-gray-300 italic">No words completed yet</div>
+              <div id="completedWordsList" class="flex flex-wrap gap-2 mt-2 hidden">
+                <!-- Completed words will be dynamically inserted here -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+const apiCheck = async (current) => {
+  try {
+    const res = await fetch('/api/check', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ current })
+    });
+    if (!res.ok) {
+      console.error('API request failed with status:', res.status);
+      return { isWord: false, canContinue: false };
+    }
+    return res.json();
+  } catch (error) {
+    console.error('API request failed with error:', error);
+    return { isWord: false, canContinue: false };
+  }
+}
+
+// Game state
+let players = [];
+let active = [];
+let currentIndex = 0;
+let currentWord = '';
+let completedWords = [];
+let timerInterval = null;
+let timeLeft = 10;
+
+// DOM Elements
+const currentPlayerName = document.getElementById('currentPlayerName');
+const timerDisplay = document.getElementById('timerDisplay');
+const noEliminated = document.getElementById('noEliminated');
+const noCompletedWords = document.getElementById('noCompletedWords');
+const completedWordsList = document.getElementById('completedWordsList');
+
+// Get URL parameters to initialize game
+function initGameFromUrl() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const playerNames = urlParams.get('players');
+  
+  if (playerNames) {
+    const names = playerNames.split(',');
+    players = names;
+    active = names.map((name, idx) => ({ name: name, eliminated: false, index: idx }));
+    
+    // Render players
+    renderPlayers();
+    renderEliminated();
+    
+    // Start game
+    currentIndex = 0;
+    currentWord = '';
+    completedWords = [];
+    timeLeft = 10;
+    updateUI();
+    startTurn();
+  } else {
+    // Redirect to main page if no players
+    window.location.href = '/';
+  }
+}
+
+function renderPlayers() {
+  const container = document.getElementById('playersContainer');
+  container.innerHTML = '';
+  
+  active.forEach((player, idx) => {
+    if (!player.eliminated) {
+      const playerCard = document.createElement('div');
+      playerCard.className = `player-card bg-gradient-to-br from-purple-600/80 to-indigo-700/80 rounded-2xl p-4 text-white ${idx === currentIndex ? 'current-player-glow scale-105' : ''}`;
+      playerCard.innerHTML = `
+        <div class="flex items-center justify-between">
+          <div class="font-bold text-lg">${player.name}</div>
+          <div class="bg-white/20 px-3 py-1 rounded-full text-sm">
+            ${timeLeft}s
+          </div>
+        </div>
+        <div class="mt-2 text-sm opacity-80">
+          ${idx === currentIndex ? '⏰ Your turn!' : '⏳ Waiting...'}
+        </div>
+      `;
+      container.appendChild(playerCard);
+    }
+  });
+}
+
+function renderEliminated() {
+  const container = document.getElementById('eliminatedContainer');
+  const eliminatedPlayers = active.filter(p => p.eliminated);
+  
+  if (eliminatedPlayers.length === 0) {
+    noEliminated.style.display = 'block';
+    return;
+  }
+  
+  noEliminated.style.display = 'none';
+  container.innerHTML = '';
+  
+  eliminatedPlayers.forEach(player => {
+    const eliminatedCard = document.createElement('div');
+    eliminatedCard.className = 'bg-gradient-to-r from-red-600/80 to-red-800/80 rounded-xl p-3 text-white flex items-center';
+    eliminatedCard.innerHTML = `
+      <span class="mr-2">💀</span>
+      <span class="font-semibold">${player.name}</span>
+      <span class="ml-auto text-sm">Eliminated</span>
+    `;
+    container.appendChild(eliminatedCard);
+  });
+}
+
+function renderCompletedWords() {
+  if (completedWords.length === 0) {
+    noCompletedWords.style.display = 'block';
+    completedWordsList.classList.add('hidden');
+    return;
+  }
+  
+  noCompletedWords.style.display = 'none';
+  completedWordsList.classList.remove('hidden');
+  completedWordsList.innerHTML = '';
+  
+  completedWords.forEach(word => {
+    const wordSpan = document.createElement('span');
+    wordSpan.className = 'bg-gradient-to-r from-green-500 to-emerald-500 text-white px-3 py-1 rounded-full text-sm font-medium animate__animated animate__fadeIn';
+    wordSpan.textContent = word;
+    completedWordsList.appendChild(wordSpan);
+  });
+}
+
+function updateUI() {
+  document.getElementById('currentWord').textContent = currentWord || '—';
+  document.getElementById('statusText').textContent = 'Waiting for input...';
+  document.getElementById('statusText').className = 'text-xl font-medium bg-black/20 px-4 py-2 rounded-full inline-block';
+  
+  // Update timer
+  timerDisplay.textContent = timeLeft;
+  
+  // Update current player name
+  if (active[currentIndex]) {
+    currentPlayerName.textContent = active[currentIndex].name;
+  }
+  
+  // Update timer circle color based on time left
+  const timerCircle = document.querySelector('.timer-circle');
+  if (timeLeft <= 3) {
+    timerCircle.className = 'timer-circle bg-gradient-to-r from-red-600 to-red-800 text-white animate__animated animate__pulse';
+  } else if (timeLeft <= 5) {
+    timerCircle.className = 'timer-circle bg-gradient-to-r from-orange-500 to-red-600 text-white';
+  } else {
+    timerCircle.className = 'timer-circle bg-gradient-to-r from-green-500 to-emerald-500 text-white';
+  }
+  
+  // Render all UI components
+  renderPlayers();
+  renderEliminated();
+  renderCompletedWords();
+}
+
+async function submitLetter() {
+  const input = document.getElementById('letterInput');
+  const v = (input.value || '').trim().toLowerCase();
+  console.log('Player entered letter:', v);
+  
+  if (!v.match(/^[a-z]$/)) { 
+    console.log('Invalid input - not a single letter');
+    document.getElementById('statusText').textContent = '⚠️ Please enter a single letter!';
+    document.getElementById('statusText').className = 'text-xl font-medium bg-red-500/80 px-4 py-2 rounded-full inline-block animate__animated animate__shakeX';
+    
+    // Shake animation for input
+    const letterInput = document.getElementById('letterInput');
+    letterInput.classList.add('shake-animation');
+    setTimeout(() => {
+      letterInput.classList.remove('shake-animation');
+    }, 500);
+    
+    setTimeout(() => {
+      document.getElementById('statusText').textContent = 'Waiting for input...';
+      document.getElementById('statusText').className = 'text-xl font-medium bg-black/20 px-4 py-2 rounded-full inline-block';
+    }, 2000);
+    return; 
+  }
+  
+  // Clear the input field immediately
+  input.value = '';
+  
+  // Add the letter to the current word
+  const newWord = currentWord + v;
+  console.log('New word:', newWord);
+  
+  // Test if this word can lead to any valid word
+  const resp = await apiCheck(newWord);
+  const statusText = document.getElementById('statusText');
+  
+  console.log('API Response:', resp);
+  console.log('canContinue:', resp.canContinue);
+  
+  // Check if the letter leads to any valid word
+  if (resp.canContinue) {
+    // Valid letter - accept it
+    currentWord = newWord;
+    
+    // Check if it's a complete word
+    if (resp.isWord) {
+      // Add to completed words
+      if (!completedWords.includes(newWord.toUpperCase())) {
+        completedWords.push(newWord.toUpperCase());
+        statusText.textContent = `🎉 "${newWord.toUpperCase()}" is a complete word!`;
+        statusText.className = 'text-xl font-medium bg-green-500/80 px-4 py-2 rounded-full inline-block animate__animated animate__tada';
+      } else {
+        statusText.textContent = `✅ "${newWord.toUpperCase()}" continues...`;
+        statusText.className = 'text-xl font-medium bg-blue-500/80 px-4 py-2 rounded-full inline-block animate__animated animate__fadeIn';
+      }
+    } else {
+      statusText.textContent = `✅ "${newWord}" is valid`;
+      statusText.className = 'text-xl font-medium bg-blue-500/80 px-4 py-2 rounded-full inline-block animate__animated animate__fadeIn';
+    }
+    
+    console.log('Accepted letter, new word:', currentWord);
+    
+    // Move to next player after a delay
+    setTimeout(() => {
+      nextTurn();
+    }, 1500);
+  } else {
+    // Invalid letter - eliminate the current player
+    console.log('Invalid letter:', v, 'eliminating player');
+    statusText.textContent = `💥 "${newWord}" cannot form any valid word - ${active[currentIndex].name} is eliminated!`;
+    statusText.className = 'text-xl font-medium bg-red-600/80 px-4 py-2 rounded-full inline-block animate__animated animate__shakeX';
+    
+    setTimeout(() => {
+      eliminateCurrent();
+    }, 2000);
+  }
+}
+
+function eliminateCurrent() {
+  clearInterval(timerInterval);
+  active[currentIndex].eliminated = true;
+  updateUI();
+  const remaining = active.filter(p => !p.eliminated);
+  
+  if (remaining.length === 1) {
+    document.getElementById('statusText').textContent = `🏆 ${remaining[0].name} wins the game!`;
+    document.getElementById('statusText').className = 'text-2xl font-bold bg-gradient-to-r from-yellow-400 to-yellow-600 text-black px-6 py-3 rounded-full inline-block animate__animated animate__tada win-animation';
+    
+    // Disable further input
+    document.getElementById('letterInput').disabled = true;
+    document.getElementById('submitLetter').disabled = true;
+    // Clear input field
+    document.getElementById('letterInput').value = '';
+    return;
+  }
+  
+  // Find next active player
+  let nextIndex = -1;
+  for (let i = 1; i <= active.length; i++) {
+    const idx = (currentIndex + i) % active.length;
+    if (!active[idx].eliminated) {
+      nextIndex = idx;
+      break;
+    }
+  }
+  
+  if (nextIndex !== -1) {
+    currentIndex = nextIndex;
+    timeLeft = 10;
+    updateUI();
+    setTimeout(() => {
+      startTurn();
+    }, 2000);
+  }
+}
+
+function nextTurn() {
+  clearInterval(timerInterval);
+  
+  // Move to next active player
+  let nextIndex = -1;
+  for (let i = 1; i <= active.length; i++) {
+    const idx = (currentIndex + i) % active.length;
+    if (!active[idx].eliminated) {
+      nextIndex = idx;
+      break;
+    }
+  }
+  
+  if (nextIndex !== -1) {
+    currentIndex = nextIndex;
+    timeLeft = 10;
+    updateUI();
+    startTurn();
+  }
+}
+
+function startTurn() {
+  updateUI();
+  const input = document.getElementById('letterInput');
+  // Clear the input field and focus it for the next player
+  input.value = '';
+  input.focus();
+  
+  // Start timer
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    updateUI();
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      document.getElementById('statusText').textContent = `⏰ ${active[currentIndex].name} ran out of time!`;
+      document.getElementById('statusText').className = 'text-xl font-medium bg-orange-500/80 px-4 py-2 rounded-full inline-block animate__animated animate__shakeX';
+      
+      setTimeout(() => {
+        eliminateCurrent();
+      }, 1000);
+    }
+  }, 1000);
+}
+
+// Event Listeners
+document.getElementById('submitLetter').addEventListener('click', submitLetter);
+document.getElementById('letterInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') submitLetter();
+});
+
+document.getElementById('restartBtn').addEventListener('click', () => {
+  if (confirm('Are you sure you want to restart the game?')) {
+    location.reload();
+  }
+});
+
+// Initialize game when page loads
+window.addEventListener('DOMContentLoaded', initGameFromUrl);
+</script>
+</body>
+</html>
