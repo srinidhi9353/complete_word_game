@@ -42,22 +42,51 @@
       box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
       border: 2px solid gold;
     }
-    .ocean-bg {
+    /* Theme styles */
+    .theme-ocean {
       background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
     }
-    .word-container {
+    .theme-fire {
+      background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+    }
+    .theme-forest {
+      background: linear-gradient(135deg, #1d976c 0%, #93f9b9 100%);
+    }
+    .theme-purple {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    .theme-sunset {
+      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+    }
+    .word-container-ocean {
       background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
-      color: white;
-      border-radius: 16px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-      transition: all 0.3s ease;
     }
-    .player-card {
-      transition: all 0.3s ease;
-      cursor: pointer;
+    .word-container-fire {
+      background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
     }
-    .player-card:hover {
-      transform: translateY(-2px);
+    .word-container-forest {
+      background: linear-gradient(135deg, #1d976c 0%, #93f9b9 100%);
+    }
+    .word-container-purple {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    .word-container-sunset {
+      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+    }
+    .player-card-ocean {
+      background: linear-gradient(135deg, #1a2980cc 0%, #26d0cecc 100%);
+    }
+    .player-card-fire {
+      background: linear-gradient(135deg, #ff416ccc 0%, #ff4b2bcc 100%);
+    }
+    .player-card-forest {
+      background: linear-gradient(135deg, #1d976ccc 0%, #93f9b9cc 100%);
+    }
+    .player-card-purple {
+      background: linear-gradient(135deg, #667eaccc 0%, #764ba2cc 100%);
+    }
+    .player-card-sunset {
+      background: linear-gradient(135deg, #ff9a9ecc 0%, #fecfefcc 100%);
     }
     .letter-input {
       font-size: 2rem;
@@ -67,7 +96,6 @@
     }
     .letter-input:focus {
       transform: scale(1.05);
-      box-shadow: 0 0 15px rgba(26, 41, 128, 0.6);
     }
     .timer-circle {
       width: 60px;
@@ -84,12 +112,11 @@
       animation: bounce 0.5s ease infinite alternate;
     }
     .mic-active {
-      background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
       box-shadow: 0 0 15px rgba(255, 65, 108, 0.5);
     }
   </style>
 </head>
-<body class="ocean-bg min-h-screen flex items-center justify-center p-2">
+<body class="theme-ocean min-h-screen flex items-center justify-center p-2">
   <div class="w-full max-w-4xl bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl p-4 md:p-6 border border-white/20">
     <h1 class="text-2xl md:text-3xl font-bold mb-4 text-center text-white animate__animated animate__fadeInDown">
       🎯 Complete the Word
@@ -102,7 +129,7 @@
           <h2 class="text-lg font-bold text-white mb-3 flex items-center">
             <span class="mr-1">👥</span> Players
           </h2>
-          <div id="playersContainer" class="space-y-3 max-h-64 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-blue-500 scrollbar-track-blue-900/50 rounded-lg">
+          <div id="playersContainer" class="space-y-3 max-h-64 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-white/30 scrollbar-track-white/10 rounded-lg">
             <!-- Player cards will be dynamically inserted here -->
           </div>
           
@@ -119,7 +146,7 @@
 
         <!-- Game Board -->
         <div class="lg:w-2/3">
-          <div class="word-container p-5 mb-5 relative">
+          <div class="word-container-ocean p-5 mb-5 relative rounded-16">
             <div class="absolute top-3 left-3">
               <div class="text-sm opacity-90">Current Word</div>
             </div>
@@ -148,7 +175,7 @@
             </div>
             
             <div class="flex gap-2">
-              <button id="micToggleBtn" class="px-3 py-2 bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-lg hover:from-purple-700 hover:to-indigo-800 transition-all transform hover:scale-105 shadow-lg text-sm font-bold flex items-center">
+              <button id="micToggleBtn" class="px-3 py-2 bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-lg hover:from-purple-700 hover:to-indigo-800 transition-all transform hover:scale-105 shadow-lg text-sm font-bold flex items-center" disabled>
                 <span class="mr-1">🎤</span> Mic
               </button>
               <button id="restartBtn" class="px-3 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition-all transform hover:scale-105 shadow-lg text-sm font-bold flex items-center">
@@ -161,7 +188,7 @@
           <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 mb-4">
             <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
               <div class="text-white font-bold text-base">Enter a letter:</div>
-              <input id="letterInput" maxlength="1" class="letter-input border-2 border-blue-400 rounded-xl px-5 py-4 text-center w-20 bg-white/90 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-lg" placeholder="A" />
+              <input id="letterInput" maxlength="1" class="letter-input border-2 border-white/40 rounded-xl px-5 py-4 text-center w-20 bg-white/90 focus:outline-none focus:ring-2 focus:ring-white/50 shadow-lg" placeholder="A" />
               <button id="submitLetter" class="px-5 py-4 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-xl text-base font-bold hover:from-green-600 hover:to-teal-600 transition-all transform hover:scale-105 shadow-lg flex items-center">
                 <span class="mr-1">✅</span> Submit
               </button>
@@ -224,6 +251,7 @@ let completedWords = [];
 let timerInterval = null;
 let timeLeft = 10;
 let inputMethod = 'keyboard'; // 'keyboard' or 'microphone'
+let selectedTheme = 'ocean'; // Selected theme
 let recognition = null;
 let isListening = false;
 
@@ -242,6 +270,10 @@ function initGameFromUrl() {
   const urlParams = new URLSearchParams(window.location.search);
   const playerNames = urlParams.get('players');
   inputMethod = urlParams.get('input') || 'keyboard';
+  selectedTheme = urlParams.get('theme') || 'ocean';
+  
+  // Apply theme
+  applyTheme(selectedTheme);
   
   if (playerNames) {
     const names = playerNames.split(',');
@@ -266,11 +298,43 @@ function initGameFromUrl() {
       micToggleBtn.classList.add('mic-active');
     }
     
+    // Disable input method switching during game
+    micToggleBtn.disabled = true;
+    
     startTurn();
   } else {
     // Redirect to start page if no players
     window.location.href = '/start.html';
   }
+}
+
+// Apply theme to all elements
+function applyTheme(theme) {
+  document.body.className = `theme-${theme} min-h-screen flex items-center justify-center p-2`;
+  
+  // Update word container
+  const wordContainer = document.querySelector('[class^="word-container"]');
+  if (wordContainer) {
+    wordContainer.className = `word-container-${theme} p-5 mb-5 relative rounded-16`;
+  }
+  
+  // Update timer circle
+  const timerCircle = document.querySelector('.timer-circle');
+  if (timerCircle) {
+    timerCircle.className = 'timer-circle bg-gradient-to-r from-green-500 to-teal-500 text-white';
+  }
+  
+  // Update buttons based on theme
+  const buttons = document.querySelectorAll('button');
+  buttons.forEach(button => {
+    if (button.id === 'submitLetter') {
+      button.className = 'px-5 py-4 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-xl text-base font-bold hover:from-green-600 hover:to-teal-600 transition-all transform hover:scale-105 shadow-lg flex items-center';
+    } else if (button.id === 'micToggleBtn') {
+      button.className = 'px-3 py-2 bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-lg hover:from-purple-700 hover:to-indigo-800 transition-all transform hover:scale-105 shadow-lg text-sm font-bold flex items-center';
+    } else if (button.id === 'restartBtn') {
+      button.className = 'px-3 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition-all transform hover:scale-105 shadow-lg text-sm font-bold flex items-center';
+    }
+  });
 }
 
 // Initialize speech recognition
@@ -322,33 +386,10 @@ function initSpeechRecognition() {
   }
 }
 
-// Toggle microphone
+// Toggle microphone (disabled during game)
 micToggleBtn.addEventListener('click', () => {
-  if (inputMethod !== 'microphone') {
-    inputMethod = 'microphone';
-    initSpeechRecognition();
-    micStatus.classList.remove('hidden');
-    micToggleBtn.classList.add('mic-active');
-    micStatusText.textContent = 'Microphone is ready. Say a letter...';
-  } else {
-    if (isListening) {
-      // Stop listening
-      if (recognition) {
-        recognition.stop();
-      }
-      isListening = false;
-      micToggleBtn.textContent = '🎤 Mic';
-      micStatusText.textContent = 'Microphone stopped.';
-    } else {
-      // Start listening
-      if (recognition) {
-        recognition.start();
-        isListening = true;
-        micToggleBtn.textContent = '⏹️ Stop';
-        micStatusText.textContent = 'Listening... Say a letter.';
-      }
-    }
-  }
+  // Input method cannot be changed during game
+  alert('Input method cannot be changed during the game. Please restart to change input method.');
 });
 
 function renderPlayers() {
@@ -358,7 +399,7 @@ function renderPlayers() {
   active.forEach((player, idx) => {
     if (!player.eliminated) {
       const playerCard = document.createElement('div');
-      playerCard.className = `player-card bg-gradient-to-br from-blue-600/80 to-teal-700/80 rounded-xl p-3 text-white ${idx === currentIndex ? 'current-player-glow scale-105' : ''}`;
+      playerCard.className = `player-card-${selectedTheme} rounded-xl p-3 text-white ${idx === currentIndex ? 'current-player-glow scale-105' : ''}`;
       
       // Add timer effect when time is low
       let timerEffect = '';
@@ -400,7 +441,7 @@ function renderEliminated() {
   
   eliminatedPlayers.forEach(player => {
     const eliminatedCard = document.createElement('div');
-    eliminatedCard.className = 'bg-gradient-to-r from-red-600/80 to-red-800/80 rounded-lg p-2 text-white flex items-center text-sm';
+    eliminatedCard.className = `bg-gradient-to-r from-red-600/80 to-red-800/80 rounded-lg p-2 text-white flex items-center text-sm`;
     eliminatedCard.innerHTML = `
       <span class="mr-1">💀</span>
       <span class="font-semibold">${player.name}</span>

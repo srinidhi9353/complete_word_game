@@ -7,33 +7,47 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
   <style>
-    .ocean-bg {
+    .theme-ocean {
       background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
+    }
+    .theme-fire {
+      background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+    }
+    .theme-forest {
+      background: linear-gradient(135deg, #1d976c 0%, #93f9b9 100%);
+    }
+    .theme-purple {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    .theme-sunset {
+      background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
     }
     .toggle-button {
       transition: all 0.3s ease;
     }
     .toggle-button.active {
-      background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
       box-shadow: 0 0 15px rgba(255, 65, 108, 0.5);
     }
     .toggle-button.inactive {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      opacity: 0.7;
+    }
+    .toggle-button.inactive:hover {
+      opacity: 1;
     }
   </style>
 </head>
-<body class="ocean-bg min-h-screen flex items-center justify-center p-4">
+<body class="theme-ocean min-h-screen flex items-center justify-center p-4">
   <div class="w-full max-w-2xl bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl p-6 md:p-8 border border-white/20">
     <h1 class="text-3xl md:text-4xl font-bold mb-6 text-center text-white animate__animated animate__fadeInDown">
       🎯 Complete the Word
     </h1>
 
     <!-- Game Rules Section -->
-    <div class="bg-blue-500/20 border-l-4 border-blue-400 p-4 mb-6 rounded-lg animate__animated animate__fadeIn">
+    <div class="bg-white/20 border-l-4 border-white/40 p-4 mb-6 rounded-lg animate__animated animate__fadeIn">
       <h2 class="text-xl font-bold text-white mb-2 flex items-center">
         <span class="mr-2">📋</span> Game Rules
       </h2>
-      <ul class="list-disc pl-5 space-y-1 text-blue-100">
+      <ul class="list-disc pl-5 space-y-1 text-white/90">
         <li>Players take turns adding one letter to form a valid English word</li>
         <li>You can continue adding letters even after completing a valid word</li>
         <li>Elimination occurs only when a letter makes it impossible to form any valid word</li>
@@ -43,6 +57,36 @@
     </div>
 
     <div class="space-y-6 animate__animated animate__fadeInUp">
+      <!-- Theme Selection -->
+      <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+        <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
+          <span class="mr-2">🎨</span> Choose Theme
+        </h2>
+        
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+          <button data-theme="ocean" class="theme-btn active px-3 py-2 bg-gradient-to-r from-blue-600 to-teal-500 text-white rounded-lg font-bold text-sm shadow-lg transform hover:scale-105 flex flex-col items-center justify-center h-16">
+            <span class="text-lg">🌊</span>
+            <span>Ocean</span>
+          </button>
+          <button data-theme="fire" class="theme-btn inactive px-3 py-2 bg-gradient-to-r from-red-600 to-orange-500 text-white rounded-lg font-bold text-sm shadow-lg transform hover:scale-105 flex flex-col items-center justify-center h-16">
+            <span class="text-lg">🔥</span>
+            <span>Fire</span>
+          </button>
+          <button data-theme="forest" class="theme-btn inactive px-3 py-2 bg-gradient-to-r from-green-600 to-emerald-500 text-white rounded-lg font-bold text-sm shadow-lg transform hover:scale-105 flex flex-col items-center justify-center h-16">
+            <span class="text-lg">🌲</span>
+            <span>Forest</span>
+          </button>
+          <button data-theme="purple" class="theme-btn inactive px-3 py-2 bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-lg font-bold text-sm shadow-lg transform hover:scale-105 flex flex-col items-center justify-center h-16">
+            <span class="text-lg">💜</span>
+            <span>Purple</span>
+          </button>
+          <button data-theme="sunset" class="theme-btn inactive px-3 py-2 bg-gradient-to-r from-pink-500 to-orange-400 text-white rounded-lg font-bold text-sm shadow-lg transform hover:scale-105 flex flex-col items-center justify-center h-16">
+            <span class="text-lg">🌅</span>
+            <span>Sunset</span>
+          </button>
+        </div>
+      </div>
+
       <!-- Input Method Selection -->
       <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
         <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
@@ -50,7 +94,7 @@
         </h2>
         
         <div class="flex flex-col sm:flex-row gap-4 justify-center mb-6">
-          <button id="keyboardBtn" class="toggle-button active px-8 py-4 bg-gradient-to-r from-pink-500 to-orange-500 text-white rounded-xl font-bold text-lg shadow-lg transform hover:scale-105 flex items-center justify-center">
+          <button id="keyboardBtn" class="toggle-button active px-8 py-4 bg-gradient-to-r from-blue-500 to-teal-500 text-white rounded-xl font-bold text-lg shadow-lg transform hover:scale-105 flex items-center justify-center">
             <span class="mr-2">⌨️</span> Keyboard
           </button>
           <button id="micBtn" class="toggle-button inactive px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-xl font-bold text-lg shadow-lg transform hover:scale-105 flex items-center justify-center">
@@ -78,7 +122,7 @@
         
         <div class="flex flex-col sm:flex-row gap-4 items-center justify-center mb-4">
           <label class="text-lg font-medium text-white">Number of players:</label>
-          <input id="numPlayers" type="number" min="2" max="8" value="2" class="border-2 border-blue-300 rounded-xl px-4 py-2 text-center w-24 text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white/90" />
+          <input id="numPlayers" type="number" min="2" max="8" value="2" class="border-2 border-white/30 rounded-xl px-4 py-2 text-center w-24 text-lg focus:outline-none focus:ring-2 focus:ring-white/50 bg-white/90" />
           <button id="setPlayers" class="px-6 py-2 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-xl hover:from-green-600 hover:to-teal-600 transition-all transform hover:scale-105 shadow-md font-bold flex items-center">
             <span class="mr-2">⚙️</span> Set
           </button>
@@ -99,6 +143,7 @@
 <script>
 // Game state
 let inputMethod = 'keyboard'; // 'keyboard' or 'microphone'
+let selectedTheme = 'ocean'; // Default theme
 let recognition = null;
 
 // DOM Elements
@@ -109,6 +154,28 @@ const numPlayersInput = document.getElementById('numPlayers');
 const setPlayersBtn = document.getElementById('setPlayers');
 const namesContainer = document.getElementById('namesContainer');
 const startBtn = document.getElementById('startGame');
+const themeButtons = document.querySelectorAll('.theme-btn');
+
+// Theme selection
+themeButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    // Remove active class from all buttons
+    themeButtons.forEach(b => {
+      b.classList.remove('active');
+      b.classList.add('inactive');
+    });
+    
+    // Add active class to clicked button
+    btn.classList.remove('inactive');
+    btn.classList.add('active');
+    
+    // Set selected theme
+    selectedTheme = btn.getAttribute('data-theme');
+    
+    // Change body background
+    document.body.className = `theme-${selectedTheme} min-h-screen flex items-center justify-center p-4`;
+  });
+});
 
 // Toggle input method
 keyboardBtn.addEventListener('click', () => {
@@ -162,7 +229,7 @@ setPlayersBtn.addEventListener('click', () => {
     div.className = 'flex flex-col sm:flex-row gap-3 items-center justify-center animate__animated animate__fadeIn';
     div.innerHTML = `
       <label class="text-white font-medium w-32 text-center sm:text-left">Player ${i+1}:</label>
-      <input class="playerName border-2 border-blue-200 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-48 bg-white/90" value="Player ${i+1}" placeholder="Enter name" />
+      <input class="playerName border-2 border-white/30 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-white/50 w-48 bg-white/90" value="Player ${i+1}" placeholder="Enter name" />
     `;
     namesContainer.appendChild(div);
   }
@@ -178,9 +245,9 @@ startBtn.addEventListener('click', () => {
   
   const players = nameInputs.map(i => i.value.trim() || 'Player');
   
-  // Redirect to game page with player names and input method as URL parameters
+  // Redirect to game page with player names, input method, and theme as URL parameters
   const playerNames = players.join(',');
-  window.location.href = `/game.html?players=${encodeURIComponent(playerNames)}&input=${inputMethod}`;
+  window.location.href = `/game.html?players=${encodeURIComponent(playerNames)}&input=${inputMethod}&theme=${selectedTheme}`;
 });
 
 // Initialize
