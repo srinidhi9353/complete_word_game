@@ -249,22 +249,22 @@ async function submitLetter() {
     return; 
   }
   
-  // Simple logic: Check if the new word is a prefix of any word in data
+  // Add the letter to the current word
   const newWord = currentWord + v;
-  console.log('Testing word:', newWord);
+  console.log('New word:', newWord);
   
-  // Test the word
+  // Test if this word can lead to any valid word
   const resp = await apiCheck(newWord);
   const statusText = document.getElementById('statusText');
   
   console.log('API Response:', resp);
   console.log('canContinue:', resp.canContinue);
   
-  // Only check if it's a valid prefix
+  // Check if the letter leads to any valid word
   if (resp.canContinue) {
-    // Valid prefix - accept the letter
+    // Valid letter - accept it and move to next player
     currentWord = newWord;
-    statusText.textContent = `✅ "${currentWord}" is a valid prefix`;
+    statusText.textContent = `✅ "${currentWord}" can form valid words`;
     statusText.className = 'text-green-500 font-bold text-lg';
     console.log('Accepted letter, new word:', currentWord);
     
@@ -273,13 +273,12 @@ async function submitLetter() {
       nextTurn();
     }, 1500);
   } else {
-    // Not a valid prefix - reject the letter
-    console.log('Rejected letter:', v, 'for word:', newWord);
-    statusText.textContent = `❌ "${newWord}" is not a valid prefix - try a different letter`;
+    // Invalid letter - eliminate the current player
+    console.log('Invalid letter:', v, 'eliminating player');
+    statusText.textContent = `❌ "${newWord}" cannot form any valid word - ${active[currentIndex].name} is eliminated!`;
     statusText.className = 'text-red-500 font-bold text-lg';
     setTimeout(() => {
-      statusText.textContent = '—';
-      statusText.className = 'text-lg font-medium';
+      eliminateCurrent();
     }, 2000);
   }
 }
